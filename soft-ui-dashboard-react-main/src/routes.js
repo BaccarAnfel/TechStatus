@@ -41,6 +41,7 @@ import CustomerSupport from "examples/Icons/CustomerSupport";
 import CreditCard from "examples/Icons/CreditCard";
 import Cube from "examples/Icons/Cube";
 import Locaux from "layouts/locaux";
+import Order from "layouts/order";
 
 
 const routes = [
@@ -58,17 +59,26 @@ const routes = [
     name: "Tables",
     key: "tables",
     route: "/tables",
-    icon: <Office size="12px" />,
+    icon: <Settings size="12px" />,
     component: <Tables />,
     noCollapse: true,
   },
   {
     type: "collapse",
-    name: "Locaux",
+    name: "Locals",
     key: "locaux",
     route: "/locaux",
-    icon: <Map size="12px"/>,
+    icon: <Office size="12px"/>,
     component: <Locaux />,
+    noCollapse: true,
+  },
+  {
+    type: "collapse",
+    name: "Order",
+    key: "order",
+    route: "/order",
+    icon: <Document size="12px"/>,
+    component: <Order />,
     noCollapse: true,
   }
   /*
