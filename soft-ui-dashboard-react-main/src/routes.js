@@ -1,18 +1,3 @@
-/**
-=========================================================
-* Soft UI Dashboard React - v4.0.1
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/soft-ui-dashboard-react
-* Copyright 2023 Creative Tim (https://www.creative-tim.com)
-
-Coded by www.creative-tim.com
-
- =========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-*/
-
 /** 
   All of the routes for the Soft UI Dashboard React are added here,
   You can add a new route, customize the routes and delete the routes here.
@@ -48,12 +33,15 @@ import SignUp from "layouts/authentication/sign-up";
 // Soft UI Dashboard React icons
 import Shop from "examples/Icons/Shop";
 import Office from "examples/Icons/Office";
+import Map from "examples/Icons/Map";
 import Settings from "examples/Icons/Settings";
 import Document from "examples/Icons/Document";
 import SpaceShip from "examples/Icons/SpaceShip";
 import CustomerSupport from "examples/Icons/CustomerSupport";
 import CreditCard from "examples/Icons/CreditCard";
 import Cube from "examples/Icons/Cube";
+import Locaux from "layouts/locaux";
+
 
 const routes = [
   {
@@ -74,6 +62,16 @@ const routes = [
     component: <Tables />,
     noCollapse: true,
   },
+  {
+    type: "collapse",
+    name: "Locaux",
+    key: "locaux",
+    route: "/locaux",
+    icon: <Map size="12px"/>,
+    component: <Locaux />,
+    noCollapse: true,
+  }
+  /*
   {
     type: "collapse",
     name: "Billing",
@@ -128,7 +126,7 @@ const routes = [
     icon: <SpaceShip size="12px" />,
     component: <SignUp />,
     noCollapse: true,
-  },
+  },*/
 ];
 
 export default routes;
