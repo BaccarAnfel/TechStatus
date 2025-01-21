@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import SoftBox from "components/SoftBox";
 import SoftTypography from "components/SoftTypography";
 
-function Equipement() {
+function EquipementTable() {
   const [equipements, setEquipements] = useState([]); // State for storing equipment data
   const [loading, setLoading] = useState(true); // Loading state
 
@@ -199,4 +199,4 @@ function Equipement() {
   );
 }
 
-export default Equipement;
+export default EquipementTable;

@@ -1,25 +1,26 @@
+import Card from "@mui/material/Card";
 import React, { useEffect, useState } from "react";
 import SoftBox from "components/SoftBox";
 import SoftTypography from "components/SoftTypography";
 
-function Locaux() {
-  const [locaux, setLocaux] = useState([]); // State for storing location data
-  const [loading, setLoading] = useState(true); // Loading state
+function SalleTable() {
+  const [salles, setSalles] = useState([]); // State pour stocker les données des salles
+  const [loading, setLoading] = useState(true); // State pour gérer le chargement
 
-  // Fetch location data on component load
+  // Récupérer les données des salles au chargement du composant
   useEffect(() => {
-    const fetchLocauxData = async () => {
+    const fetchSallesData = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/locaux");
+        const response = await fetch("http://localhost:5000/api/salles"); // Endpoint API pour les salles
         const data = await response.json();
         console.log("Données récupérées:", data);
 
-        // Ensure data is an array
+        // Vérifier que les données sont un tableau
         if (Array.isArray(data)) {
-          setLocaux(data);
+          setSalles(data);
         } else {
           console.error("Expected an array but got:", data);
-          setLocaux([]); // Fallback to an empty array
+          setSalles([]); // Fallback à un tableau vide
         }
 
         setLoading(false);
@@ -29,7 +30,7 @@ function Locaux() {
       }
     };
 
-    fetchLocauxData();
+    fetchSallesData();
   }, []);
 
   if (loading) {
@@ -40,7 +41,7 @@ function Locaux() {
     );
   }
 
-  if (!Array.isArray(locaux)) {
+  if (!Array.isArray(salles)) {
     return (
       <SoftBox py={3}>
         <SoftTypography variant="h6" color="error">
@@ -51,10 +52,12 @@ function Locaux() {
   }
 
   return (
-
-              <SoftBox px={3}>
+          <Card>
+            <SoftBox p={3} sx={{ paddingTop: "50px" }}>
+              {/* Ajouter un espace après chaque table */}
+              <SoftBox mb={4}> {/* Espace de 16px (theme.spacing(4)) après la table Salle */}
                 <SoftTypography variant="h6" fontWeight="bold" mb={2}>
-                  Table des locaux
+                  Table des Salles
                 </SoftTypography>
                 <table style={{ width: "100%", borderCollapse: "collapse" }}>
                   <thead>
@@ -69,7 +72,7 @@ function Locaux() {
                           borderBottom: "1px solid #e0e0e0",
                         }}
                       >
-                        ID DE LOCAL
+                        ID DE SALLE
                       </th>
                       <th
                         style={{
@@ -81,7 +84,19 @@ function Locaux() {
                           borderBottom: "1px solid #e0e0e0",
                         }}
                       >
-                        NOM DE LOCAL
+                        NOM DE SALLE
+                      </th>
+                      <th
+                        style={{
+                          textAlign: "left",
+                          padding: "10px 15px",
+                          color: "#8392ab",
+                          fontWeight: "bold",
+                          fontSize: "14px",
+                          borderBottom: "1px solid #e0e0e0",
+                        }}
+                      >
+                        NOM DE LOCALE
                       </th>
                       <th
                         style={{
@@ -98,27 +113,37 @@ function Locaux() {
                     </tr>
                   </thead>
                   <tbody>
-                    {locaux.map((locale, index) => (
-                      <tr key={locale.local_id}>
+                    {salles.map((salle, index) => (
+                      <tr key={salle.salle_id}>
                         <td
                           style={{
                             padding: "10px 15px",
                             fontSize: "14px",
                             color: "#344767",
-                            borderBottom: index !== locaux.length - 1 ? "1px solid #e0e0e0" : "none",
+                            borderBottom: index !== salles.length - 1 ? "1px solid #e0e0e0" : "none",
                           }}
                         >
-                          {locale.local_id}
+                          {salle.salle_id}
                         </td>
                         <td
                           style={{
                             padding: "10px 15px",
                             fontSize: "14px",
                             color: "#344767",
-                            borderBottom: index !== locaux.length - 1 ? "1px solid #e0e0e0" : "none",
+                            borderBottom: index !== salles.length - 1 ? "1px solid #e0e0e0" : "none",
                           }}
                         >
-                          {locale.nom_Local}
+                          {salle.nom_Salle}
+                        </td>
+                        <td
+                          style={{
+                            padding: "10px 15px",
+                            fontSize: "14px",
+                            color: "#344767",
+                            borderBottom: index !== salles.length - 1 ? "1px solid #e0e0e0" : "none",
+                          }}
+                        >
+                          {salle.nom_Local}
                         </td>
                         <td
                           style={{
@@ -126,7 +151,7 @@ function Locaux() {
                             textAlign: "center",
                             fontSize: "14px",
                             color: "#344767",
-                            borderBottom: index !== locaux.length - 1 ? "1px solid #e0e0e0" : "none",
+                            borderBottom: index !== salles.length - 1 ? "1px solid #e0e0e0" : "none",
                           }}
                         >
                           <SoftTypography
@@ -149,8 +174,9 @@ function Locaux() {
                   </tbody>
                 </table>
               </SoftBox>
-
+            </SoftBox>
+          </Card>
   );
 }
 
-export default Locaux;
+export default SalleTable;

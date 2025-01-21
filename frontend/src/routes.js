@@ -1,26 +1,19 @@
 import Dashboard from "layouts/dashboard";
-import Tables from "layouts/tables";
 import Billing from "layouts/billing";
 import VirtualReality from "layouts/virtual-reality";
 import RTL from "layouts/rtl";
 import Profile from "layouts/profile";
 import SignIn from "layouts/authentication/sign-in";
 import SignUp from "layouts/authentication/sign-up";
+import Commande from "layouts/commande";
+import Equipement from "layouts/equipement";
+import Locaux from "layouts/locaux";
+import Salle from "layouts/salle";
 
-// Soft UI Dashboard React icons
 import Shop from "examples/Icons/Shop";
-import Office from "examples/Icons/Office";
-import Map from "examples/Icons/Map";
 import Settings from "examples/Icons/Settings";
 import Document from "examples/Icons/Document";
-import SpaceShip from "examples/Icons/SpaceShip";
 import CustomerSupport from "examples/Icons/CustomerSupport";
-import CreditCard from "examples/Icons/CreditCard";
-import Cube from "examples/Icons/Cube";
-import Locaux from "layouts/tables/components/locaux";
-import Ordre from "layouts/Ordre";
-import Equipement from "layouts/tables/components/equipement";
-import Salle from "layouts/tables/components/salle";
 
 
 const routes = [
@@ -35,51 +28,40 @@ const routes = [
   },
   {
     type: "collapse",
-    name: "Tables",
-    key: "tables",
-    route: "/tables",
-    icon: <Settings size="12px" />,
-    component: <Tables />,
-    noCollapse: true,
-  },
-  {
-    type: "collapse",
-    name: "Ordre",
-    key: "Ordre",
-    route: "/Ordre",
+    name: "Commande",
+    key: "Commande",
+    route: "/Commande",
     icon: <Document size="12px"/>,
-    component: <Ordre />,
-    noCollapse: true,
-  }
-  /*
-  {
-    type: "collapse",
-    name: "Billing",
-    key: "billing",
-    route: "/billing",
-    icon: <CreditCard size="12px" />,
-    component: <Billing />,
+    component: <Commande />,
     noCollapse: true,
   },
   {
     type: "collapse",
-    name: "Virtual Reality",
-    key: "virtual-reality",
-    route: "/virtual-reality",
-    icon: <Cube size="12px" />,
-    component: <VirtualReality />,
+    name: "Equipement",
+    key: "equipement",
+    route: "/equipement",
+    icon: <Document size="12px" />,
+    component: <Equipement />,
     noCollapse: true,
   },
   {
     type: "collapse",
-    name: "RTL",
-    key: "rtl",
-    route: "/rtl",
-    icon: <Settings size="12px" />,
-    component: <RTL />,
+    name: "Locaux",
+    key: "locaux",
+    route: "/locaux",
+    icon: <Document size="12px" />,
+    component: <Locaux />,
     noCollapse: true,
   },
-  { type: "title", title: "Account Pages", key: "account-pages" },
+  {
+    type: "collapse",
+    name: "Salle",
+    key: "Salle",
+    route: "/salle",
+    icon: <Document size="12px" />,
+    component: <Salle />,
+    noCollapse: true,
+  },
   {
     type: "collapse",
     name: "Profile",
@@ -88,25 +70,7 @@ const routes = [
     icon: <CustomerSupport size="12px" />,
     component: <Profile />,
     noCollapse: true,
-  },
-  {
-    type: "collapse",
-    name: "Sign In",
-    key: "sign-in",
-    route: "/authentication/sign-in",
-    icon: <Document size="12px" />,
-    component: <SignIn />,
-    noCollapse: true,
-  },
-  {
-    type: "collapse",
-    name: "Sign Up",
-    key: "sign-up",
-    route: "/authentication/sign-up",
-    icon: <SpaceShip size="12px" />,
-    component: <SignUp />,
-    noCollapse: true,
-  },*/
+  }
 ];
 
 export default routes;

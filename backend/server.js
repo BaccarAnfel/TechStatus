@@ -46,19 +46,16 @@ app.get("/api/equipements", (req, res) => {
       }
     });
 });
+
+//Commandes
 app.get("/api/commandes", (req, res) => {
     const query = `
       SELECT 
         commande.command_id, 
         commande.statut, 
-        commande.date, 
-        Utilisateur.nom AS nom_utilisateur 
+        commande.date
       FROM 
         commande 
-      JOIN 
-        Utilisateur 
-      ON 
-        commande.utilisateur_id = Utilisateur.utilisateur_id;
     `;
   
     db.query(query, (err, results) => {
@@ -70,32 +67,52 @@ app.get("/api/commandes", (req, res) => {
       }
     });
 });
+app.get("/api/commandes/:command_id", (req, res) => {
+    const command_id = req.params.command_id; // Récupérer l'ID de la commande depuis les paramètres de l'URL
 
-// Route GET pour récupérer les salles avec le nom du local
-app.get("/api/salles", (req, res) => {
     const query = `
       SELECT 
-        salle.salle_id, 
-        salle.nom_Salle, 
-        locale.nom_Local 
+        commande.command_id, 
+        commande.statut, 
+        commande.date, 
+        Equipement.nom_Equipement AS nom_Equipement, 
+        commande_equipement.quantity
       FROM 
-        salle 
+        commande 
       JOIN 
-        locale 
+        commande_equipement 
       ON 
-        salle.local_id = locale.local_id;
-    `; // Requête SQL pour sélectionner les salles avec le nom du local
-  
-    db.query(query, (err, results) => {
-      if (err) {
-        console.error("Erreur lors de la récupération des salles:", err);
-        res.status(500).json({ error: "Erreur de la base de données" });
-      } else {
-        res.json(results); // Envoyer les résultats en JSON
-      }
+        commande.command_id = commande_equipement.command_id 
+      JOIN 
+        Equipement 
+      ON 
+        commande_equipement.equipement_id = Equipement.equipement_id 
+      WHERE 
+        commande.command_id = ?;
+    `;
+
+    db.query(query, [command_id], (err, results) => {
+        if (err) {
+            console.error("Erreur lors de la récupération des détails de la commande:", err);
+            res.status(500).json({ error: "Erreur de la base de données" });
+        } else if (results.length === 0) {
+            res.status(404).json({ error: "Commande non trouvée" }); // Si aucune commande n'est trouvée
+        } else {
+            // Structurer les résultats pour renvoyer un objet unique avec les détails de la commande
+            const orderDetails = {
+                command_id: results[0].command_id,
+                statut: results[0].statut,
+                date: results[0].date,
+                equipements: results.map((row) => ({
+                    nom: row.nom_Equipement, // Utiliser le nom de l'équipement
+                    quantite: row.quantity,
+                })),
+            };
+
+            res.json(orderDetails); // Envoyer les résultats en JSON
+        }
     });
 });
-
 app.post("/api/ordre", (req, res) => {
     const { articles } = req.body; // Récupérer uniquement les articles
 
@@ -142,10 +159,10 @@ app.post("/api/ordre", (req, res) => {
             const insertArticlesPromises = articles.map((article) => {
                 return new Promise((resolve, reject) => {
                     const insertArticleQuery = `
-                        INSERT INTO commande_equipement (command_id, nom_Equipement, quantity)
+                        INSERT INTO commande_equipement (command_id, equipement_id, quantity)
                         VALUES (?, ?, ?);
                     `;
-                    db.query(insertArticleQuery, [commandId, article.nom_Equipement, article.quantity], (err, results) => {
+                    db.query(insertArticleQuery, [commandId, article.equipement_id, article.quantity], (err, results) => {
                         if (err) {
                             reject(err);
                         } else {
@@ -179,6 +196,98 @@ app.post("/api/ordre", (req, res) => {
         });
     });
 });
+
+//les salles
+app.get("/api/salles", (req, res) => {
+    const query = `
+      SELECT 
+        salle.salle_id, 
+        salle.nom_Salle, 
+        locale.nom_Local 
+      FROM 
+        salle 
+      JOIN 
+        locale 
+      ON 
+        salle.local_id = locale.local_id;
+    `; // Requête SQL pour sélectionner les salles avec le nom du local
+  
+    db.query(query, (err, results) => {
+      if (err) {
+        console.error("Erreur lors de la récupération des salles:", err);
+        res.status(500).json({ error: "Erreur de la base de données" });
+      } else {
+        res.json(results); // Envoyer les résultats en JSON
+      }
+    });
+});
+
+//Dashbord 
+app.get("/api/total-orders", (req, res) => {
+    const query = "SELECT COUNT(*) as total FROM commande"; // Query to count total orders
+
+    db.query(query, (err, results) => {
+        if (err) {
+            console.error("Error fetching total orders:", err);
+            res.status(500).json({ error: "Erreur de la base de données" });
+        } else {
+            res.json({ total: results[0].total }); // Send the total count as JSON
+        }
+    });
+});
+
+app.get("/api/total-equipments", (req, res) => {
+    const query = "SELECT COUNT(*) as total FROM equipement"; // Query to count total equipment
+
+    db.query(query, (err, results) => {
+        if (err) {
+            console.error("Error fetching total equipment:", err);
+            res.status(500).json({ error: "Erreur de la base de données" });
+        } else {
+            res.json({ total: results[0].total }); // Send the total count as JSON
+        }
+    });
+});
+app.get("/api/orders-per-month", (req, res) => {
+    const query = `
+        SELECT 
+            DATE_FORMAT(date, '%Y-%m') as month, 
+            COUNT(*) as orders 
+        FROM commande 
+        GROUP BY DATE_FORMAT(date, '%Y-%m') 
+        ORDER BY month;
+    `; // Query to count orders per month
+
+    db.query(query, (err, results) => {
+        if (err) {
+            console.error("Error fetching orders per month:", err);
+            res.status(500).json({ error: "Erreur de la base de données" });
+        } else {
+            res.json(results); // Send the results as JSON
+        }
+    });
+});
+
+app.get("/api/equipment-status", (req, res) => {
+    const query = `
+        SELECT 
+            status, 
+            COUNT(*) as value 
+        FROM equipement 
+        GROUP BY status;
+    `; // Query to count equipment by status
+
+    db.query(query, (err, results) => {
+        if (err) {
+            console.error("Error fetching equipment status:", err);
+            res.status(500).json({ error: "Erreur de la base de données" });
+        } else {
+            res.json(results); // Send the results as JSON
+        }
+    });
+});
+
+
 app.listen(5000, () => {
     console.log("server running");
 });

@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import SoftBox from "components/SoftBox";
 import SoftTypography from "components/SoftTypography";
 
-function Commande() {
+function CommandeTable() {
   const [commandes, setCommandes] = useState([]); // State pour stocker les données des commandes
   const [loading, setLoading] = useState(true); // State pour gérer le chargement
 
@@ -198,4 +198,4 @@ function Commande() {
   );
 }
 
-export default Commande;
+export default CommandeTable;

@@ -72,9 +72,7 @@ function Ordre() {
 };
 
   return (
-    <DashboardLayout>
-      <DashboardNavbar />
-      <SoftBox mb={3}>
+
         <Card>
           <SoftBox display="flex" justifyContent="space-between" alignItems="center" p={3}>
             <SoftTypography variant="h6">Passer une commande</SoftTypography>
@@ -143,8 +141,6 @@ function Ordre() {
             </SoftBox>
           </SoftBox>
         </Card>
-      </SoftBox>
-    </DashboardLayout>
   );
 }
 
