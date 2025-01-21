@@ -9,6 +9,7 @@ import Commande from "layouts/commande";
 import Equipement from "layouts/equipement";
 import Locaux from "layouts/locaux";
 import Salle from "layouts/salle";
+import EditCommande from "layouts/commande/Components/Edit";
 
 import Shop from "examples/Icons/Shop";
 import Settings from "examples/Icons/Settings";
@@ -70,7 +71,15 @@ const routes = [
     icon: <CustomerSupport size="12px" />,
     component: <Profile />,
     noCollapse: true,
-  }
+  },
+  {
+    type: "route",
+    name: "Edit Commande",
+    key: "edit-commande",
+    route: "/edit-commande/:commandId", // Route dynamique avec l'ID de la commande
+    component: <EditCommande />, // Composant pour éditer la commande
+    noCollapse: true,
+  },
 ];
 
 export default routes;

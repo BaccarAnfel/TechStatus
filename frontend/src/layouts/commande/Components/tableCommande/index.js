@@ -2,10 +2,12 @@ import Card from "@mui/material/Card";
 import React, { useEffect, useState } from "react";
 import SoftBox from "components/SoftBox";
 import SoftTypography from "components/SoftTypography";
+import { useNavigate } from "react-router-dom";
 
 function CommandeTable() {
   const [commandes, setCommandes] = useState([]); // State pour stocker les données des commandes
   const [loading, setLoading] = useState(true); // State pour gérer le chargement
+  const navigate = useNavigate();
 
   // Récupérer les données des commandes au chargement du composant
   useEffect(() => {
@@ -185,7 +187,9 @@ function CommandeTable() {
                       cursor: "pointer",
                       color: "#5e72e4",
                     }}
+                    onClick={() => navigate(`/edit-commande/${commande.command_id}`)} // Redirige vers la page d'édition
                   >
+                    
                     Edit
                   </SoftTypography>
                 </td>
