@@ -1,10 +1,6 @@
-import Card from "@mui/material/Card";
 import React, { useEffect, useState } from "react";
 import SoftBox from "components/SoftBox";
 import SoftTypography from "components/SoftTypography";
-
-import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
-import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 
 function Locaux() {
   const [locaux, setLocaux] = useState([]); // State for storing location data
@@ -17,7 +13,15 @@ function Locaux() {
         const response = await fetch("http://localhost:5000/api/locaux");
         const data = await response.json();
         console.log("Données récupérées:", data);
-        setLocaux(data);
+
+        // Ensure data is an array
+        if (Array.isArray(data)) {
+          setLocaux(data);
+        } else {
+          console.error("Expected an array but got:", data);
+          setLocaux([]); // Fallback to an empty array
+        }
+
         setLoading(false);
       } catch (error) {
         console.error("Erreur lors de la récupération des données :", error);
@@ -36,13 +40,18 @@ function Locaux() {
     );
   }
 
-  return (
-    <DashboardLayout>
-      <DashboardNavbar />
+  if (!Array.isArray(locaux)) {
+    return (
       <SoftBox py={3}>
-        <SoftBox mb={3}>
-          <Card>
-            <SoftBox py={3}>
+        <SoftTypography variant="h6" color="error">
+          Erreur: Les données reçues ne sont pas valides.
+        </SoftTypography>
+      </SoftBox>
+    );
+  }
+
+  return (
+
               <SoftBox px={3}>
                 <SoftTypography variant="h6" fontWeight="bold" mb={2}>
                   Table des locaux
@@ -89,8 +98,8 @@ function Locaux() {
                     </tr>
                   </thead>
                   <tbody>
-                    {locaux.map((local, index) => (
-                      <tr key={local.localId}>
+                    {locaux.map((locale, index) => (
+                      <tr key={locale.local_id}>
                         <td
                           style={{
                             padding: "10px 15px",
@@ -99,7 +108,7 @@ function Locaux() {
                             borderBottom: index !== locaux.length - 1 ? "1px solid #e0e0e0" : "none",
                           }}
                         >
-                          {local.localId}
+                          {locale.local_id}
                         </td>
                         <td
                           style={{
@@ -109,7 +118,7 @@ function Locaux() {
                             borderBottom: index !== locaux.length - 1 ? "1px solid #e0e0e0" : "none",
                           }}
                         >
-                          {local.nom}
+                          {locale.nom_Local}
                         </td>
                         <td
                           style={{
@@ -140,11 +149,7 @@ function Locaux() {
                   </tbody>
                 </table>
               </SoftBox>
-            </SoftBox>
-          </Card>
-        </SoftBox>
-      </SoftBox>
-    </DashboardLayout>
+
   );
 }
 
