@@ -148,8 +148,8 @@ function EditCommande() {
 
         {/* Afficher les articles de la commande */}
         {articles.map((article, index) => (
-          <SoftBox key={index} display="flex" justifyContent="space-between" ml={3} mr={3} mt={2}>
-            <SoftBox flex={1} mr={3}>
+          <SoftBox key={index} display="flex" justifyContent="space-between" ml={3} >
+            <SoftBox flex={1}>
               <Select
                 labelId="equipement-label"
                 value={article.equipement_id || ""}
@@ -170,6 +170,7 @@ function EditCommande() {
 
             <SoftBox flex={1} ml={3}>
               <SoftInput
+                icon={{ direction: "left" }}
                 type="number"
                 placeholder="Quantité"
                 value={article.quantity || ""}

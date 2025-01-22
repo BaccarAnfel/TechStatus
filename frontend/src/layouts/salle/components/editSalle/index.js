@@ -25,29 +25,29 @@ function EditSalle() {
         // Récupérer les détails de la salle et les informations du local associé
         const salleResponse = await fetch(`http://localhost:5000/api/salles/${salle_id}`);
         const salleData = await salleResponse.json();
-  
+
         // Vérifier si les données sont valides
         if (!salleData || !salleData.local_id) {
           console.error("Données de la salle ou local_id non trouvées");
           setLoading(false);
           return;
         }
-  
+
         // Mettre à jour l'état de la salle avec les données récupérées
         setSalle(salleData);
-  
+
         // Récupérer la liste des locaux
         const locauxResponse = await fetch("http://localhost:5000/api/locaux");
         const locauxData = await locauxResponse.json();
         setLocaux(locauxData); // Mettre à jour l'état des locaux
-  
+
         setLoading(false);
       } catch (error) {
         console.error("Erreur lors de la récupération des données :", error);
         setLoading(false);
       }
     };
-  
+
     fetchData();
   }, [salle_id]);
 
@@ -101,12 +101,13 @@ function EditSalle() {
               Modifier la salle
             </SoftTypography>
           </SoftBox>
-          <SoftBox flexWrap="wrap" display="flex" justifyContent="space-between" ml={3} mr={3}>
+          <SoftBox flexWrap="wrap" display="flex" justifyContent="space-between" ml={3}>
             <SoftBox flex={1} mr={3}>
               <SoftTypography variant="h6" mb={1}>
                 Nom de la salle
               </SoftTypography>
               <SoftInput
+                icon={{ direction: "left" }}
                 type="text"
                 placeholder="Nom de la salle"
                 name="nom_Salle"
@@ -125,13 +126,17 @@ function EditSalle() {
                 onChange={handleInputChange}
                 style={{
                   width: "100%",
+                  height: "54%",
                   padding: "8px",
-                  borderRadius: "4px",
+                  borderRadius: "8px",
                   border: "1px solid #ccc",
                   fontSize: "14px",
                 }}
               >
-                <option value="" disabled>Sélectionner un local</option> {/* Option désactivée par défaut */}
+                <option value="" disabled>
+                  Sélectionner un local
+                </option>{" "}
+                {/* Option désactivée par défaut */}
                 {locaux.map((local) => (
                   <option key={local.local_id} value={local.local_id}>
                     {local.nom_Local}
@@ -140,11 +145,11 @@ function EditSalle() {
               </select>
             </SoftBox>
           </SoftBox>
-          <SoftBox display="flex" justifyContent="center" mt={3} mb={3} gap={2}>
+          <SoftBox display="flex" justifyContent="center" mt={3} mb={3} gap={3}>
             <SoftButton
               variant="gradient"
               color="error"
-              sx={{ width: "40%" }}
+              sx={{ width: "47%" }}
               onClick={() => navigate("/salles")} // Annuler et revenir à la table des salles
             >
               Annuler
@@ -152,7 +157,7 @@ function EditSalle() {
             <SoftButton
               variant="gradient"
               color="secondary"
-              sx={{ width: "40%" }}
+              sx={{ width: "47%" }}
               onClick={handleSubmit}
             >
               Enregistrer

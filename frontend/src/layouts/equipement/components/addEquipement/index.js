@@ -77,9 +77,10 @@ function AddEquipement({ onCancel, onEquipementAdded }) {
             Ajouter un nouvel équipement
           </SoftTypography>
         </SoftBox>
-        <SoftBox flexWrap="wrap" display="flex" justifyContent="space-between" ml={3} mr={3}>
+        <SoftBox flexWrap="wrap" display="flex" justifyContent="space-between" ml={3}>
           <SoftBox flex={1} mr={3}>
             <SoftInput
+              icon={{ direction: "left" }}
               type="text"
               placeholder="Nom de l'équipement"
               name="nom_equipement"
@@ -104,19 +105,14 @@ function AddEquipement({ onCancel, onEquipementAdded }) {
             </Select>
           </SoftBox>
         </SoftBox>
-        <SoftBox display="flex" justifyContent="center" mt={3} mb={3} gap={2}>
-          <SoftButton
-            variant="gradient"
-            color="error"
-            sx={{ width: "40%" }}
-            onClick={handleCancel}
-          >
+        <SoftBox display="flex" justifyContent="center" mt={3} mb={3} gap={3}>
+          <SoftButton variant="gradient" color="error" sx={{ width: "47%" }} onClick={handleCancel}>
             Annuler
           </SoftButton>
           <SoftButton
             variant="gradient"
             color="secondary"
-            sx={{ width: "40%" }}
+            sx={{ width: "47%" }}
             onClick={handleSubmit}
           >
             Confirmer

@@ -20,7 +20,8 @@ function AddSalle({ onCancel }) {
   };
 
   const handleSubmit = async () => {
-    if (!salle.nom_Salle) { // Supprimer la validation de capacite
+    if (!salle.nom_Salle) {
+      // Supprimer la validation de capacite
       alert("Veuillez remplir tous les champs.");
       return;
     }
@@ -56,9 +57,10 @@ function AddSalle({ onCancel }) {
             Ajouter une nouvelle salle
           </SoftTypography>
         </SoftBox>
-        <SoftBox flexWrap="wrap" display="flex" justifyContent="space-between" ml={3} mr={3}>
+        <SoftBox flexWrap="wrap" display="flex" justifyContent="space-between" ml={3}>
           <SoftBox flex={1} mr={3}>
             <SoftInput
+              icon={{ direction: "left" }}
               type="text"
               placeholder="Nom de la salle"
               name="nom_Salle"
@@ -68,19 +70,14 @@ function AddSalle({ onCancel }) {
             />
           </SoftBox>
         </SoftBox>
-        <SoftBox display="flex" justifyContent="center" mt={3} mb={3} gap={2}>
-          <SoftButton
-            variant="gradient"
-            color="error"
-            sx={{ width: "40%" }}
-            onClick={onCancel}
-          >
+        <SoftBox display="flex" justifyContent="center" mt={3} mb={3} gap={3}>
+          <SoftButton variant="gradient" color="error" sx={{ width: "47%" }} onClick={onCancel}>
             Annuler
           </SoftButton>
           <SoftButton
             variant="gradient"
             color="secondary"
-            sx={{ width: "40%" }}
+            sx={{ width: "47%" }}
             onClick={handleSubmit}
           >
             Confirmer

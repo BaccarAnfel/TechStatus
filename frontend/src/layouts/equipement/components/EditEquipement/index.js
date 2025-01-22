@@ -92,6 +92,7 @@ function EditEquipement() {
                 Nom de equipement
               </SoftTypography>
               <SoftInput
+                icon={{ direction: "left" }}
                 type="text"
                 placeholder="Nom de l'équipement"
                 name="nom_Equipement"
@@ -100,7 +101,7 @@ function EditEquipement() {
                 fullWidth
               />
             </SoftBox>
-            <SoftBox flex={1} mr={3}>
+            <SoftBox flex={1} >
               <SoftTypography variant="h6" mb={1}>
                 Statut
               </SoftTypography>
@@ -120,11 +121,11 @@ function EditEquipement() {
               </Select>
             </SoftBox>
           </SoftBox>
-          <SoftBox display="flex" justifyContent="center" mt={3} mb={3} gap={2}>
+          <SoftBox display="flex" justifyContent="center" mt={3} mb={3} gap={3}>
             <SoftButton
               variant="gradient"
               color="error"
-              sx={{ width: "40%" }}
+              sx={{ width: "47%" }}
               onClick={() => navigate("/equipements")} // Annuler et revenir à la table des équipements
             >
               Annuler
@@ -132,7 +133,7 @@ function EditEquipement() {
             <SoftButton
               variant="gradient"
               color="secondary"
-              sx={{ width: "40%" }}
+              sx={{ width: "47%" }}
               onClick={handleSubmit}
             >
               Enregistrer

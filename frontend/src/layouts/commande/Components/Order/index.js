@@ -87,7 +87,7 @@ function Ordre() {
         </SoftBox>
 
         {/* Champ pour le statut */}
-        <SoftBox ml={3} mr={3} mt={2}>
+        <SoftBox ml={3} mr={3} mt={1}>
           <FormControl fullWidth>
             <Select
               value={status}
@@ -136,7 +136,7 @@ function Ordre() {
           </SoftBox>
         ))}
 
-        <SoftBox m={3}>
+        <SoftBox ml={3} mr={3} mb={2}>
           <SoftButton variant="gradient" color="dark" fullWidth onClick={handleAddArticle}>
             Ajouter un autre article
           </SoftButton>

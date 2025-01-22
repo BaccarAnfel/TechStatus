@@ -83,12 +83,13 @@ function EditLocaux() {
               Modifier le local
             </SoftTypography>
           </SoftBox>
-          <SoftBox flexWrap="wrap" display="flex" justifyContent="space-between" ml={3} mr={3}>
+          <SoftBox flexWrap="wrap" display="flex" justifyContent="space-between" ml={3}>
             <SoftBox flex={1} mr={3}>
               <SoftTypography variant="h6" mb={1}>
                 Nom du local
               </SoftTypography>
               <SoftInput
+                icon={{ direction: "left" }}
                 type="text"
                 placeholder="Nom du local"
                 name="nom_Local"
@@ -98,11 +99,11 @@ function EditLocaux() {
               />
             </SoftBox>
           </SoftBox>
-          <SoftBox display="flex" justifyContent="center" mt={3} mb={3} gap={2}>
+          <SoftBox display="flex" justifyContent="center" mt={3} mb={3} gap={3}>
             <SoftButton
               variant="gradient"
               color="error"
-              sx={{ width: "40%" }}
+              sx={{ width: "47%" }}
               onClick={() => navigate("/locaux")} // Annuler et revenir à la table des locaux
             >
               Annuler
@@ -110,7 +111,7 @@ function EditLocaux() {
             <SoftButton
               variant="gradient"
               color="secondary"
-              sx={{ width: "40%" }}
+              sx={{ width: "47%" }}
               onClick={handleSubmit}
             >
               Enregistrer
