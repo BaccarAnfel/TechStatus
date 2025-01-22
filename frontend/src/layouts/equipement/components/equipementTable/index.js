@@ -2,10 +2,12 @@ import Card from "@mui/material/Card";
 import React, { useEffect, useState } from "react";
 import SoftBox from "components/SoftBox";
 import SoftTypography from "components/SoftTypography";
+import { useNavigate } from "react-router-dom";
 
 function EquipementTable() {
   const [equipements, setEquipements] = useState([]); // State for storing equipment data
   const [loading, setLoading] = useState(true); // Loading state
+  const navigate = useNavigate();
 
   // Fetch equipment data on component load
   useEffect(() => {
@@ -33,6 +35,25 @@ function EquipementTable() {
     fetchEquipementData();
   }, []);
 
+  // Function to handle equipment deletion
+  const handleDelete = async (equipementId) => {
+    try {
+      const response = await fetch(`http://localhost:5000/api/equipements/${equipementId}`, {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        // Remove the deleted equipment from the state
+        setEquipements(equipements.filter(equipement => equipement.equipement_id !== equipementId));
+        console.log("Équipement supprimé avec succès");
+      } else {
+        console.error("Erreur lors de la suppression de l'équipement");
+      }
+    } catch (error) {
+      console.error("Erreur lors de la suppression de l'équipement :", error);
+    }
+  };
+
   if (loading) {
     return (
       <SoftBox py={3}>
@@ -52,148 +73,166 @@ function EquipementTable() {
   }
 
   return (
-          <SoftBox >
-            <SoftTypography variant="h6" fontWeight="bold" mb={2}>
-              {`Table des Équipements`} {/* Fixed: Escaped apostrophe */}
-            </SoftTypography>
-            <table style={{ width: "100%", borderCollapse: "collapse" }}>
-              <thead>
-                <tr>
-                  <th
-                    style={{
-                      textAlign: "left",
-                      padding: "10px 15px",
-                      color: "#8392ab",
-                      fontWeight: "bold",
-                      fontSize: "14px",
-                      borderBottom: "1px solid #e0e0e0",
-                    }}
-                  >
-                    ID DE L&apos;ÉQUIPEMENT {/* Fixed: Escaped apostrophe */}
-                  </th>
-                  <th
-                    style={{
-                      textAlign: "left",
-                      padding: "10px 15px",
-                      color: "#8392ab",
-                      fontWeight: "bold",
-                      fontSize: "14px",
-                      borderBottom: "1px solid #e0e0e0",
-                    }}
-                  >
-                    NOM DE L&apos;ÉQUIPEMENT {/* Fixed: Escaped apostrophe */}
-                  </th>
-                  <th
-                    style={{
-                      textAlign: "left",
-                      padding: "10px 15px",
-                      color: "#8392ab",
-                      fontWeight: "bold",
-                      fontSize: "14px",
-                      borderBottom: "1px solid #e0e0e0",
-                    }}
-                  >
-                    COMMAND ID
-                  </th>
-                  <th
-                    style={{
-                      textAlign: "left",
-                      padding: "10px 15px",
-                      color: "#8392ab",
-                      fontWeight: "bold",
-                      fontSize: "14px",
-                      borderBottom: "1px solid #e0e0e0",
-                    }}
-                  >
-                    STATUS
-                  </th>
-                  <th
-                    style={{
-                      textAlign: "center",
-                      padding: "10px 15px",
-                      color: "#8392ab",
-                      fontWeight: "bold",
-                      fontSize: "14px",
-                      borderBottom: "1px solid #e0e0e0",
-                    }}
-                  >
-                    ACTION
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {equipements.map((equipement, index) => (
-                  <tr key={equipement.equipement_id}>
-                    <td
-                      style={{
-                        padding: "10px 15px",
-                        fontSize: "14px",
-                        color: "#344767",
-                        borderBottom: index !== equipements.length - 1 ? "1px solid #e0e0e0" : "none",
-                      }}
-                    >
-                      {equipement.equipement_id}
-                    </td>
-                    <td
-                      style={{
-                        padding: "10px 15px",
-                        fontSize: "14px",
-                        color: "#344767",
-                        borderBottom: index !== equipements.length - 1 ? "1px solid #e0e0e0" : "none",
-                      }}
-                    >
-                      {equipement.nom_Equipement}
-                    </td>
-                    <td
-                      style={{
-                        padding: "10px 15px",
-                        fontSize: "14px",
-                        color: "#344767",
-                        borderBottom: index !== equipements.length - 1 ? "1px solid #e0e0e0" : "none",
-                      }}
-                    >
-                      {equipement.command_id}
-                    </td>
-                    <td
-                      style={{
-                        padding: "10px 15px",
-                        fontSize: "14px",
-                        color: "#344767",
-                        borderBottom: index !== equipements.length - 1 ? "1px solid #e0e0e0" : "none",
-                      }}
-                    >
-                      {equipement.status || "N/A"} {/* Display status or "N/A" if null */}
-                    </td>
-                    <td
-                      style={{
-                        padding: "10px 15px",
-                        textAlign: "center",
-                        fontSize: "14px",
-                        color: "#344767",
-                        borderBottom: index !== equipements.length - 1 ? "1px solid #e0e0e0" : "none",
-                      }}
-                    >
-                      <SoftTypography
-                        component="a"
-                        href="#"
-                        variant="caption"
-                        color="secondary"
-                        fontWeight="medium"
-                        style={{
-                          textDecoration: "underline",
-                          cursor: "pointer",
-                          color: "#5e72e4",
-                        }}
-                      >
-                        Edit
-                      </SoftTypography>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </SoftBox>
+    <SoftBox>
+      <SoftTypography variant="h6" fontWeight="bold" mb={2}>
+        {`Table des Équipements`} {/* Fixed: Escaped apostrophe */}
+      </SoftTypography>
+      <table style={{ width: "100%", borderCollapse: "collapse" }}>
+        <thead>
+          <tr>
+            <th
+              style={{
+                textAlign: "left",
+                padding: "10px 15px",
+                color: "#8392ab",
+                fontWeight: "bold",
+                fontSize: "14px",
+                borderBottom: "1px solid #e0e0e0",
+              }}
+            >
+              ID DE L&apos;ÉQUIPEMENT {/* Fixed: Escaped apostrophe */}
+            </th>
+            <th
+              style={{
+                textAlign: "left",
+                padding: "10px 15px",
+                color: "#8392ab",
+                fontWeight: "bold",
+                fontSize: "14px",
+                borderBottom: "1px solid #e0e0e0",
+              }}
+            >
+              NOM DE L&apos;ÉQUIPEMENT {/* Fixed: Escaped apostrophe */}
+            </th>
+            <th
+              style={{
+                textAlign: "left",
+                padding: "10px 15px",
+                color: "#8392ab",
+                fontWeight: "bold",
+                fontSize: "14px",
+                borderBottom: "1px solid #e0e0e0",
+              }}
+            >
+              COMMAND ID
+            </th>
+            <th
+              style={{
+                textAlign: "left",
+                padding: "10px 15px",
+                color: "#8392ab",
+                fontWeight: "bold",
+                fontSize: "14px",
+                borderBottom: "1px solid #e0e0e0",
+              }}
+            >
+              STATUS
+            </th>
+            <th
+              style={{
+                textAlign: "center",
+                padding: "10px 15px",
+                color: "#8392ab",
+                fontWeight: "bold",
+                fontSize: "14px",
+                borderBottom: "1px solid #e0e0e0",
+              }}
+            >
+              ACTION
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {equipements.map((equipement, index) => (
+            <tr key={equipement.equipement_id}>
+              <td
+                style={{
+                  padding: "10px 15px",
+                  fontSize: "14px",
+                  color: "#344767",
+                  borderBottom: index !== equipements.length - 1 ? "1px solid #e0e0e0" : "none",
+                }}
+              >
+                {equipement.equipement_id}
+              </td>
+              <td
+                style={{
+                  padding: "10px 15px",
+                  fontSize: "14px",
+                  color: "#344767",
+                  borderBottom: index !== equipements.length - 1 ? "1px solid #e0e0e0" : "none",
+                }}
+              >
+                {equipement.nom_Equipement}
+              </td>
+              <td
+                style={{
+                  padding: "10px 15px",
+                  fontSize: "14px",
+                  color: "#344767",
+                  borderBottom: index !== equipements.length - 1 ? "1px solid #e0e0e0" : "none",
+                }}
+              >
+                {equipement.command_id}
+              </td>
+              <td
+                style={{
+                  padding: "10px 15px",
+                  fontSize: "14px",
+                  color: "#344767",
+                  borderBottom: index !== equipements.length - 1 ? "1px solid #e0e0e0" : "none",
+                }}
+              >
+                {equipement.status || "N/A"} {/* Display status or "N/A" if null */}
+              </td>
+              <td
+                style={{
+                  padding: "10px 15px",
+                  textAlign: "center",
+                  fontSize: "14px",
+                  color: "#344767",
+                  borderBottom: index !== equipements.length - 1 ? "1px solid #e0e0e0" : "none",
+                }}
+              >
+                <SoftTypography
+                  component="a"
+                  href="#"
+                  variant="caption"
+                  color="secondary"
+                  fontWeight="medium"
+                  style={{
+                    textDecoration: "underline",
+                    cursor: "pointer",
+                    color: "#5e72e4",
+                    marginRight: "10px"
+                  }}
+                  onClick={() => navigate(`/edit-equipement/${equipement.equipement_id}`)}
+                >
+                  Modifier
+                </SoftTypography>
 
+                <SoftTypography
+                  component="a"
+                  href="#"
+                  variant="caption"
+                  color="error"
+                  fontWeight="medium"
+                  style={{
+                    textDecoration: "underline",
+                    cursor: "pointer",
+                    color: "#f5365c",
+                    
+                  }}
+                  onClick={() => handleDelete(equipement.equipement_id)}
+                >
+                  Supprimer
+                </SoftTypography>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </SoftBox>
   );
 }
 

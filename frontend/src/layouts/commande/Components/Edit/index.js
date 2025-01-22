@@ -13,10 +13,10 @@ import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 function EditCommande() {
   const { commandId } = useParams(); // Récupérer l'ID de la commande depuis l'URL
   const navigate = useNavigate();
-  const [articles, setArticles] = useState([]);
-  const [equipements, setEquipements] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [articles, setArticles] = useState([]); // État pour les articles de la commande
+  const [equipements, setEquipements] = useState([]); // État pour la liste des équipements disponibles
+  const [loading, setLoading] = useState(true); // État pour le chargement
+  const [error, setError] = useState(null); // État pour les erreurs
 
   // Récupérer les détails de la commande depuis l'API
   useEffect(() => {
@@ -27,7 +27,16 @@ function EditCommande() {
           throw new Error("Commande non trouvée");
         }
         const data = await response.json();
-        setArticles(data.equipements); // Mettre à jour les articles avec les équipements de la commande
+        console.log("Données de la commande:", data); // Afficher les données dans la console
+
+        // Mettre à jour les articles avec les équipements de la commande
+        setArticles(
+          data.equipements.map((equipement) => ({
+            equipement_id: equipement.equipement_id, // Assurez-vous que c'est la bonne clé
+            quantity: equipement.quantity,
+            nom_Equipement: equipement.nom_Equipement || "Non spécifié", // Assurez-vous que c'est la bonne clé
+          }))
+        );
         setLoading(false);
       } catch (error) {
         console.error("Erreur lors de la récupération de la commande:", error);
@@ -39,7 +48,7 @@ function EditCommande() {
     fetchCommande();
   }, [commandId]);
 
-  // Récupérer la liste des équipements
+  // Récupérer la liste des équipements disponibles
   useEffect(() => {
     const fetchEquipements = async () => {
       try {
@@ -54,26 +63,40 @@ function EditCommande() {
     fetchEquipements();
   }, []);
 
+  // Gérer le changement d'équipement
   const handleEquipementChange = (index, value) => {
     const newArticles = [...articles];
+    const selectedEquipement = equipements.find((equipement) => equipement.equipement_id === value);
+
     newArticles[index].equipement_id = value;
+    newArticles[index].nom_Equipement = selectedEquipement ? selectedEquipement.nom_Equipement : "";
     setArticles(newArticles);
   };
 
+  // Gérer le changement de quantité
   const handleQuantityChange = (index, value) => {
     const newArticles = [...articles];
     newArticles[index].quantity = value;
     setArticles(newArticles);
   };
 
+  // Ajouter un nouvel article à la commande
   const handleAddArticle = () => {
-    setArticles([...articles, { equipement_id: "", quantity: "" }]);
+    setArticles([...articles, { equipement_id: "", quantity: 1, nom_Equipement: "" }]);
   };
 
+  // Supprimer un article de la commande
+  const handleRemoveArticle = (index) => {
+    const newArticles = articles.filter((_, i) => i !== index);
+    setArticles(newArticles);
+  };
+
+  // Annuler et revenir à la page d'accueil
   const handleCancel = () => {
-    navigate("/"); // Rediriger vers la page d'accueil ou une autre page
+    navigate("/commandes");
   };
 
+  // Sauvegarder les modifications
   const handleSubmit = async () => {
     try {
       const response = await fetch(`http://localhost:5000/api/commandes/${commandId}`, {
@@ -85,8 +108,8 @@ function EditCommande() {
       });
 
       if (response.ok) {
-        console.log("Commande mise à jour avec succès !");
-        navigate("/"); // Rediriger vers la page d'accueil ou une autre page
+        alert("Commande mise à jour avec succès !");
+        navigate("/commandes"); // Rediriger vers la liste des commandes
       } else {
         console.error("Erreur lors de la mise à jour de la commande");
       }
@@ -95,12 +118,24 @@ function EditCommande() {
     }
   };
 
+  // Afficher un message de chargement
   if (loading) {
-    return <div>Chargement en cours...</div>;
+    return (
+      <SoftBox py={3}>
+        <SoftTypography variant="h6">Chargement en cours...</SoftTypography>
+      </SoftBox>
+    );
   }
 
+  // Afficher un message d'erreur
   if (error) {
-    return <div>Erreur : {error}</div>;
+    return (
+      <SoftBox py={3}>
+        <SoftTypography variant="h6" color="error">
+          Erreur : {error}
+        </SoftTypography>
+      </SoftBox>
+    );
   }
 
   return (
@@ -111,6 +146,7 @@ function EditCommande() {
           <SoftTypography variant="h6">Éditer la commande #{commandId}</SoftTypography>
         </SoftBox>
 
+        {/* Afficher les articles de la commande */}
         {articles.map((article, index) => (
           <SoftBox key={index} display="flex" justifyContent="space-between" ml={3} mr={3} mt={2}>
             <SoftBox flex={1} mr={3}>
@@ -119,12 +155,13 @@ function EditCommande() {
                 value={article.equipement_id || ""}
                 onChange={(e) => handleEquipementChange(index, e.target.value)}
                 displayEmpty
+                fullWidth
               >
                 <MenuItem value="" disabled>
-                  Choisir un équipement
+                  Sélectionner un équipement
                 </MenuItem>
-                {equipements.map((equipement, i) => (
-                  <MenuItem key={i} value={equipement.equipement_id}>
+                {equipements.map((equipement) => (
+                  <MenuItem key={equipement.equipement_id} value={equipement.equipement_id}>
                     {equipement.nom_Equipement}
                   </MenuItem>
                 ))}
@@ -133,22 +170,34 @@ function EditCommande() {
 
             <SoftBox flex={1} ml={3}>
               <SoftInput
-                icon={{ direction: "left" }}
                 type="number"
                 placeholder="Quantité"
-                value={article.quantity}
+                value={article.quantity || ""}
                 onChange={(e) => handleQuantityChange(index, e.target.value)}
+                fullWidth
               />
+            </SoftBox>
+
+            <SoftBox flex={1} ml={3}>
+              <SoftButton
+                variant="gradient"
+                color="error"
+                onClick={() => handleRemoveArticle(index)}
+              >
+                Supprimer
+              </SoftButton>
             </SoftBox>
           </SoftBox>
         ))}
 
+        {/* Bouton pour ajouter un nouvel article */}
         <SoftBox m={3}>
           <SoftButton variant="gradient" color="dark" fullWidth onClick={handleAddArticle}>
-            Ajouter un article
+            Ajouter un nouvel article
           </SoftButton>
         </SoftBox>
 
+        {/* Boutons Annuler et Enregistrer */}
         <SoftBox mb={3} display="flex" justifyContent="space-around" alignItems="stretch">
           <SoftBox>
             <SoftButton

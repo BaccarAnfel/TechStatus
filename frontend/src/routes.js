@@ -1,10 +1,5 @@
 import Dashboard from "layouts/dashboard";
-import Billing from "layouts/billing";
-import VirtualReality from "layouts/virtual-reality";
-import RTL from "layouts/rtl";
 import Profile from "layouts/profile";
-import SignIn from "layouts/authentication/sign-in";
-import SignUp from "layouts/authentication/sign-up";
 import Commande from "layouts/commande";
 import Equipement from "layouts/equipement";
 import Locaux from "layouts/locaux";
@@ -19,7 +14,10 @@ import Basket from "examples/Icons/Basket";
 import Cube from "examples/Icons/Cube";
 import Map from "examples/Icons/Map";
 import Office from "examples/Icons/Office";
-
+import EditEquipement from "layouts/equipement/components/EditEquipement";
+import EditLocaux from "layouts/locaux/components/editLocaux";
+import EditSalle from "layouts/salle/components/editSalle";
+import PrintCommande from "layouts/commande/Components/Imprimer";
 
 const routes = [
   {
@@ -61,7 +59,7 @@ const routes = [
   {
     type: "collapse",
     name: "Salles",
-    key: "Salles",
+    key: "salles",
     route: "/salles",
     icon: <Office size="12px" />,
     component: <Salle />,
@@ -82,6 +80,38 @@ const routes = [
     key: "edit-commande",
     route: "/edit-commande/:commandId", // Route dynamique avec l'ID de la commande
     component: <EditCommande />, // Composant pour éditer la commande
+    noCollapse: true,
+  },
+  {
+    type: "route",
+    name: "Edit Equipement",
+    key: "edit-equipement",
+    route: "/edit-equipement/:equipement_id", // Route dynamique avec l'ID de la commande
+    component: <EditEquipement />, // Composant pour éditer la commande
+    noCollapse: true,
+  },
+  {
+    type: "route",
+    name: "Edit Locaux",
+    key: "edit-locaux",
+    route: "/edit-locaux/:local_id", // Route dynamique avec l'ID de la commande
+    component: <EditLocaux />, // Composant pour éditer la commande
+    noCollapse: true,
+  },
+  {
+    type: "route",
+    name: "Edit Salle",
+    key: "edit-salle",
+    route: "/edit-salle/:salle_id", // Route dynamique avec l'ID de la commande
+    component: <EditSalle />, // Composant pour éditer la commande
+    noCollapse: true,
+  },
+  {
+    type: "route",
+    name: "Imprimer commande",
+    key: "imprimer commande",
+    route: "/commandes/:commandId/print", // Route dynamique avec l'ID de la commande
+    component: <PrintCommande />, // Composant pour éditer la commande
     noCollapse: true,
   },
 ];

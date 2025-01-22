@@ -1,22 +1,53 @@
-import Card from "@mui/material/Card";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
+import PropTypes from "prop-types"; // Importer PropTypes
 import SoftBox from "components/SoftBox";
 import SoftTypography from "components/SoftTypography";
 import SoftInput from "components/SoftInput";
 import SoftButton from "components/SoftButton";
-import SoftDropDown from "components/SoftDropDown";
+import Card from "@mui/material/Card";
 
-import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
-import DashboardNavbar from "examples/Navbars/DashboardNavbar";
+function AddSalle({ onCancel }) {
+  const [salle, setSalle] = useState({
+    nom_Salle: "", // Supprimer le champ capacite
+  });
 
-function AjoutSalle() {
-  const types = ["Bureau d'enseignant", "Salle d'enseignement"];
-  const departments = [
-    "Département Informatique",
-    "Département de mastères",
-    "Locaux communs 3",
-    "Locaux commun 4",
-  ];
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setSalle((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = async () => {
+    if (!salle.nom_Salle) { // Supprimer la validation de capacite
+      alert("Veuillez remplir tous les champs.");
+      return;
+    }
+
+    try {
+      const response = await fetch("http://localhost:5000/api/salles", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(salle), // Envoyer uniquement nom_Salle
+      });
+
+      if (response.ok) {
+        alert("Salle ajoutée avec succès !");
+        setSalle({ nom_Salle: "" }); // Réinitialiser uniquement nom_Salle
+        if (onCancel) onCancel(); // Masquer le formulaire
+      } else {
+        console.error("Erreur lors de l'ajout de la salle");
+        alert("Erreur lors de l'ajout de la salle");
+      }
+    } catch (error) {
+      console.error("Erreur lors de l'envoi de la requête:", error);
+      alert("Erreur lors de l'envoi de la requête");
+    }
+  };
+
   return (
     <SoftBox mb={3}>
       <Card>
@@ -27,44 +58,42 @@ function AjoutSalle() {
         </SoftBox>
         <SoftBox flexWrap="wrap" display="flex" justifyContent="space-between" ml={3} mr={3}>
           <SoftBox flex={1} mr={3}>
-            <SoftInput icon={{ direction: "left" }} type="name" placeholder="Nom" />
-          </SoftBox>
-          <SoftBox flex={1} ml={3} mb={3}>
-            <SoftDropDown placeholder={"Département"} optionsList={departments} />
-          </SoftBox>
-        </SoftBox>
-        <SoftBox
-          flexWrap="wrap"
-          mb={3}
-          display="flex"
-          justifyContent="space-around"
-          alignItems="stretch"
-        >
-          <SoftBox flex={1} mr={3} ml={3}>
-            <SoftButton
-              variant="gradient"
-              color="secondary"
-              sx={{
-                width: "100%",
-              }}
-            >
-              Confirmer
-            </SoftButton>
+            <SoftInput
+              type="text"
+              placeholder="Nom de la salle"
+              name="nom_Salle"
+              value={salle.nom_Salle}
+              onChange={handleChange}
+              fullWidth
+            />
           </SoftBox>
         </SoftBox>
-        <SoftBox
-          sx={{
-            "& .MuiTableRow-root:not(:last-child)": {
-              "& td": {
-                borderBottom: ({ borders: { borderWidth, borderColor } }) =>
-                  `${borderWidth[1]} solid ${borderColor}`,
-              },
-            },
-          }}
-        ></SoftBox>
+        <SoftBox display="flex" justifyContent="center" mt={3} mb={3} gap={2}>
+          <SoftButton
+            variant="gradient"
+            color="error"
+            sx={{ width: "40%" }}
+            onClick={onCancel}
+          >
+            Annuler
+          </SoftButton>
+          <SoftButton
+            variant="gradient"
+            color="secondary"
+            sx={{ width: "40%" }}
+            onClick={handleSubmit}
+          >
+            Confirmer
+          </SoftButton>
+        </SoftBox>
       </Card>
     </SoftBox>
   );
 }
 
-export default AjoutSalle;
+// Validation des props
+AddSalle.propTypes = {
+  onCancel: PropTypes.func.isRequired, // onCancel est une fonction obligatoire
+};
+
+export default AddSalle;

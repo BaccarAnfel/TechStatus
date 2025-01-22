@@ -35,6 +35,25 @@ function CommandeTable() {
     fetchCommandesData();
   }, []);
 
+  // Fonction pour supprimer une commande
+  const handleDeleteCommande = async (commandId) => {
+    try {
+      const response = await fetch(`http://localhost:5000/api/commandesDel/${commandId}`, {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        // Mettre à jour la liste des commandes après suppression
+        setCommandes(commandes.filter((commande) => commande.command_id !== commandId));
+        console.log("Commande supprimée avec succès !");
+      } else {
+        console.error("Erreur lors de la suppression de la commande");
+      }
+    } catch (error) {
+      console.error("Erreur lors de la suppression de la commande :", error);
+    }
+  };
+
   if (loading) {
     return (
       <SoftBox py={3}>
@@ -186,11 +205,42 @@ function CommandeTable() {
                       textDecoration: "underline",
                       cursor: "pointer",
                       color: "#5e72e4",
+                      marginRight: "10px", // Espace entre les boutons
                     }}
                     onClick={() => navigate(`/edit-commande/${commande.command_id}`)} // Redirige vers la page d'édition
                   >
-                    
-                    Edit
+                    Modifier
+                  </SoftTypography>
+                  <SoftTypography
+                    component="a"
+                    href="#"
+                    variant="caption"
+                    color="error"
+                    fontWeight="medium"
+                    style={{
+                      textDecoration: "underline",
+                      cursor: "pointer",
+                      color: "#f5365c",
+                      marginRight: "10px",
+                    }}
+                    onClick={() => handleDeleteCommande(commande.command_id)} // Supprime la commande
+                  >
+                    Supprimer
+                  </SoftTypography>
+                  <SoftTypography
+                    component="a"
+                    href="#"
+                    variant="caption"
+                    color="error"
+                    fontWeight="medium"
+                    style={{
+                      textDecoration: "underline",
+                      cursor: "pointer",
+                      color: "#f5365c", // Couleur rouge pour le bouton Supprimer
+                    }}
+                    onClick={() => navigate(`/commandes/${commande.command_id}/print`)}
+                  >
+                    Imprimer
                   </SoftTypography>
                 </td>
               </tr>

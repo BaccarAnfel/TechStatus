@@ -46,29 +46,37 @@ app.delete('api/locaux/:local_id', (req, res) => {
 ////////////////////////////////////////////////////////////////
 // GET local PAR ID AJOUTE PAR SIRIN
 ////////////////////////////////////////////////////////////////
-app.get("api/locaux/:local_id", (req, res) => {
-    const { local_id } = req.params.local_id;
-    const query = `SELECT locale.local_id, locale.nom_Local, local.dep_id WHERE local.local_id = ?`;
-    db.query(query, [local_id], (err, results) => {
-      if (err) {
-        console.error(
-          "Erreur lors de la récupération des détails du local",
-          err
-        );
-        res.status(500).send("Erreur de la base de données");
-      } else if (results.length === 0) {
-        res.status(404).send("local non trouvée");
-      } else {
-        const salleDetails = {
-            local_id: results[0].local_id,
-            nom_Local: results[0].nom_Local,
-            dep_id: results[0].dep_id,
-        };
-  
-        res.json(salleDetails);
-      }
-    });
+app.get("/api/locaux/:local_id", (req, res) => {
+  const { local_id } = req.params; // Récupérer l'ID du local depuis les paramètres de la requête
+
+  const query = "SELECT * FROM locale WHERE local_id = ?"; // Requête SQL pour sélectionner un local par son ID
+  db.query(query, [local_id], (err, results) => {
+    if (err) {
+      console.error("Erreur lors de la récupération du local:", err);
+      res.status(500).json({ error: "Erreur de la base de données" });
+    } else if (results.length === 0) {
+      res.status(404).json({ error: "Local non trouvé" }); // Si aucun local n'est trouvé
+    } else {
+      res.json(results[0]); // Envoyer les données du local en JSON
+    }
   });
+});
+app.put("/api/locaux/:local_id", (req, res) => {
+  const { local_id } = req.params; // Récupérer l'ID du local depuis les paramètres de la requête
+  const { nom_Local } = req.body; // Récupérer les données à mettre à jour depuis le corps de la requête
+
+  const query = "UPDATE locale SET nom_Local = ? WHERE local_id = ?"; // Requête SQL pour mettre à jour le local
+  db.query(query, [nom_Local, local_id], (err, results) => {
+    if (err) {
+      console.error("Erreur lors de la mise à jour du local:", err);
+      res.status(500).json({ error: "Erreur de la base de données" });
+    } else if (results.affectedRows === 0) {
+      res.status(404).json({ error: "Local non trouvé" }); // Si aucun local n'est trouvé
+    } else {
+      res.json({ message: "Local mis à jour avec succès" }); // Réponse de succès
+    }
+  });
+});
   
   //////////////////////////////////////////////////////////
 
@@ -85,25 +93,74 @@ app.get("/api/locaux", (req, res) => {
     }
   });
 });
+// Route pour ajouter un local
+app.post("/api/addLocaux", (req, res) => {
+  const { nom_Local } = req.body; // Supprimer capacite
+
+  // Requête SQL mise à jour pour insérer uniquement nom_Local
+  const query = "INSERT INTO locale (nom_Local) VALUES (?)";
+  db.query(query, [nom_Local], (err, results) => {
+    if (err) {
+      console.error("Erreur lors de l'ajout du local:", err);
+      res.status(500).json({ error: "Erreur de la base de données" });
+    } else {
+      res.json({ message: "Local ajouté avec succès" });
+    }
+  });
+});
+
+app.delete('/api/locaux/:local_id', (req, res) => {
+  const { local_id } = req.params; // Récupérer l'ID du local depuis les paramètres de la requête
+
+    const deleteLocaleQuery = 'DELETE FROM locale WHERE local_id = ?';
+    db.query(deleteLocaleQuery, [local_id], (err, result) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).send('Erreur lors de la suppression du local');
+      }
+
+      if (result.affectedRows === 0) {
+        return res.status(404).send('Local non trouvé');
+      }
+
+      // Si tout s'est bien passé
+      res.send('Local et enregistrements liés supprimés avec succès');
+    });
+});
+
 
 // Equipments
 
 //////////////////////////////////////////////////////////
 // delete equipment par id ajouté par Siriiiin
 //////////////////////////////////////////////////////////
-app.delete('api/equipements/:equipement_id', (req, res) => {
-    const { equipement_id } = req.params.equipement_id;
-    const query = 'DELETE FROM salle WHERE equipement_id = ?';
-    db.query(query, [equipement_id], (err, result) => {
-        if (err) {
-            console.error(err);
-            res.status(500).send('Error deleting equipement');
-        } else if (result.affectedRows === 0) {
-            res.status(404).send('equipement not found');
-        } else {
-            res.send('equipement deleted successfully');
-        }
-    });
+app.delete('/api/equipements/:equipement_id', (req, res) => {
+  const { equipement_id } = req.params; // Correction : Utiliser req.params directement
+
+  // Étape 1 : Supprimer les enregistrements liés dans la table `commande_equipement`
+  const deleteCommandEquipementQuery = 'DELETE FROM commande_equipement WHERE equipement_id = ?';
+  db.query(deleteCommandEquipementQuery, [equipement_id], (err, result) => {
+      if (err) {
+          console.error(err);
+          return res.status(500).send('Error deleting related records in commande_equipement');
+      }
+
+      // Étape 2 : Supprimer l'équipement de la table `equipement`
+      const deleteEquipementQuery = 'DELETE FROM equipement WHERE equipement_id = ?';
+      db.query(deleteEquipementQuery, [equipement_id], (err, result) => {
+          if (err) {
+              console.error(err);
+              return res.status(500).send('Error deleting equipement');
+          }
+
+          if (result.affectedRows === 0) {
+              return res.status(404).send('Equipement not found');
+          }
+
+          // Si tout s'est bien passé
+          res.send('Equipement and related records deleted successfully');
+      });
+  });
 });
 
 ///////////////////////////////////////////////////////////////////////////
@@ -121,25 +178,113 @@ app.get("/api/equipements", (req, res) => {
     }
   });
 });
+app.get("/api/equipements/:equipement_id", (req, res) => {
+  const { equipement_id } = req.params; // Récupérer l'ID de l'équipement depuis les paramètres de la requête
+  const query = "SELECT equipement_id, nom_Equipement, status FROM equipement WHERE equipement_id = ?"; // Requête SQL pour sélectionner un équipement spécifique
+
+  db.query(query, [equipement_id], (err, results) => {
+    if (err) {
+      console.error("Erreur lors de la récupération de l'équipement:", err);
+      res.status(500).json({ error: "Erreur de la base de données" });
+    } else if (results.length === 0) {
+      res.status(404).json({ error: "Équipement non trouvé" }); // Si aucun équipement n'est trouvé
+    } else {
+      res.json(results[0]); // Envoyer le premier résultat (l'équipement) en JSON
+    }
+  });
+});
+
+app.post("/api/addEquipement", (req, res) => {
+  const { nom_equipement, status } = req.body;
+
+  const query = `
+    INSERT INTO equipement (nom_Equipement, status)
+    VALUES (?, ?);
+  `;
+
+  db.query(query, [nom_equipement, status], (err, result) => {
+    if (err) {
+      console.error("Erreur lors de l'ajout de l'équipement:", err);
+      res.status(500).json({ error: "Erreur de la base de données" });
+    } else {
+      res.status(201).json({ message: "Équipement ajouté avec succès" });
+    }
+  });
+});
+app.put("/api/equipements/:equipement_id", (req, res) => {
+  const { equipement_id } = req.params; // Récupérer l'ID de l'équipement depuis les paramètres de la requête
+  const { nom_Equipement, status } = req.body; // Récupérer les données à mettre à jour depuis le corps de la requête
+
+  // Requête SQL pour mettre à jour l'équipement
+  const query = "UPDATE equipement SET nom_Equipement = ?, status = ? WHERE equipement_id = ?";
+
+  db.query(query, [nom_Equipement, status, equipement_id], (err, results) => {
+    if (err) {
+      console.error("Erreur lors de la mise à jour de l'équipement:", err);
+      res.status(500).json({ error: "Erreur de la base de données" });
+    } else if (results.affectedRows === 0) {
+      res.status(404).json({ error: "Équipement non trouvé" }); // Si aucun équipement n'est trouvé
+    } else {
+      res.json({ message: "Équipement mis à jour avec succès" }); // Réponse de succès
+    }
+  });
+});
 
 //Commandes
 
 //////////////////////////////////////////////////////////
 // delete commande par id ajouté par Siriiiin
 //////////////////////////////////////////////////////////
-app.delete('api/commandes/:command_id', (req, res) => {
-    const { command_id } = req.params.command_id;
-    const query = 'DELETE FROM salle WHERE command_id = ?';
-    db.query(query, [command_id], (err, result) => {
+app.delete('/api/commandesDel/:commandId', (req, res) => {
+  const { commandId } = req.params; // Utilisez commandId au lieu de command_id
+
+  // Démarrer une transaction
+  db.beginTransaction((err) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).send('Error starting transaction');
+    }
+
+    // 1. Supprimer les enregistrements associés dans commande_equipement
+    const deleteCommandeEquipementQuery = 'DELETE FROM commande_equipement WHERE command_id = ?';
+    db.query(deleteCommandeEquipementQuery, [commandId], (err, result) => {
+      if (err) {
+        // Annuler la transaction en cas d'erreur
+        return db.rollback(() => {
+          console.error(err);
+          res.status(500).send('Error deleting from commande_equipement');
+        });
+      }
+
+      // 2. Supprimer la commande dans la table commandes
+      const deleteCommandeQuery = 'DELETE FROM commande WHERE command_id = ?';
+      db.query(deleteCommandeQuery, [commandId], (err, result) => {
         if (err) {
+          // Annuler la transaction en cas d'erreur
+          return db.rollback(() => {
             console.error(err);
-            res.status(500).send('Error deleting commande');
-        } else if (result.affectedRows === 0) {
-            res.status(404).send('commande not found');
-        } else {
-            res.send('commande deleted successfully');
+            res.status(500).send('Error deleting from commandes');
+          });
         }
+
+        // Valider la transaction si tout est réussi
+        db.commit((err) => {
+          if (err) {
+            return db.rollback(() => {
+              console.error(err);
+              res.status(500).send('Error committing transaction');
+            });
+          }
+
+          if (result.affectedRows === 0) {
+            res.status(404).send('Commande not found');
+          } else {
+            res.send('Commande and associated records deleted successfully');
+          }
+        });
+      });
     });
+  });
 });
 
 ///////////////////////////////////////////////////////////////////////////
@@ -164,57 +309,57 @@ app.get("/api/commandes", (req, res) => {
     }
   });
 });
-app.get("/api/commandes/:command_id", (req, res) => {
-  const command_id = req.params.command_id; // Récupérer l'ID de la commande depuis les paramètres de l'URL
+app.get("/api/commandes/:commandId", (req, res) => {
+  const { commandId } = req.params;
 
   const query = `
-      SELECT 
-        commande.command_id, 
-        commande.statut, 
-        commande.date, 
-        Equipement.nom_Equipement AS nom_Equipement, 
-        commande_equipement.quantity
-      FROM 
-        commande 
-      JOIN 
-        commande_equipement 
-      ON 
-        commande.command_id = commande_equipement.command_id 
-      JOIN 
-        Equipement 
-      ON 
-        commande_equipement.equipement_id = Equipement.equipement_id 
-      WHERE 
-        commande.command_id = ?;
-    `;
+    SELECT 
+      commande.command_id,
+      commande.statut,
+      commande.date,
+      commande_equipement.equipement_id,
+      commande_equipement.quantity,
+      equipement.nom_Equipement
+    FROM 
+      commande
+    LEFT JOIN 
+      commande_equipement 
+    ON 
+      commande.command_id = commande_equipement.command_id
+    LEFT JOIN 
+      equipement 
+    ON 
+      commande_equipement.equipement_id = equipement.equipement_id
+    WHERE 
+      commande.command_id = ?;
+  `;
 
-  db.query(query, [command_id], (err, results) => {
+  db.query(query, [commandId], (err, results) => {
     if (err) {
-      console.error(
-        "Erreur lors de la récupération des détails de la commande",
-        err
-      );
+      console.error("Erreur lors de la récupération de la commande :", err);
       res.status(500).json({ error: "Erreur de la base de données" });
     } else if (results.length === 0) {
-      res.status(404).json({ error: "Commande non trouvée" }); // Si aucune commande n'est trouvée
+      res.status(404).json({ error: "Commande non trouvée" });
     } else {
       // Structurer les résultats pour renvoyer un objet unique avec les détails de la commande
-      const orderDetails = {
+      const commandeDetails = {
         command_id: results[0].command_id,
         statut: results[0].statut,
         date: results[0].date,
         equipements: results.map((row) => ({
-          nom: row.nom_Equipement, // Utiliser le nom de l'équipement
-          quantite: row.quantity,
+          equipement_id: row.equipement_id,
+          nom_Equipement: row.nom_Equipement,
+          quantity: row.quantity,
         })),
       };
 
-      res.json(orderDetails); // Envoyer les résultats en JSON
+      res.json(commandeDetails);
     }
   });
 });
+
 app.post("/api/ordre", (req, res) => {
-  const { articles } = req.body; // Récupérer uniquement les articles
+  const { articles, status } = req.body; // Récupérer les articles et le statut
 
   // Validation des données
   if (!articles || !Array.isArray(articles)) {
@@ -235,6 +380,11 @@ app.post("/api/ordre", (req, res) => {
     }
   }
 
+  // Vérifier que le statut est valide
+  if (!status || (status !== "En cours" && status !== "Terminée")) {
+    return res.status(400).json({ error: "Statut invalide" });
+  }
+
   // Commencer une transaction
   db.beginTransaction((err) => {
     if (err) {
@@ -242,13 +392,13 @@ app.post("/api/ordre", (req, res) => {
       return res.status(500).json({ error: "Erreur de la base de données" });
     }
 
-    // Insérer la commande dans la table `commande` sans utilisateur_id
+    // Insérer la commande dans la table `commande` avec le statut
     const insertCommandeQuery = `
-            INSERT INTO commande (statut, date)
-            VALUES ('En attente', NOW());
-        `;
+      INSERT INTO commande (statut, date)
+      VALUES (?, NOW());
+    `;
 
-    db.query(insertCommandeQuery, (err, results) => {
+    db.query(insertCommandeQuery, [status], (err, results) => {
       if (err) {
         db.rollback(() => {
           console.error("Erreur lors de l'insertion de la commande:", err);
@@ -263,9 +413,9 @@ app.post("/api/ordre", (req, res) => {
       const insertArticlesPromises = articles.map((article) => {
         return new Promise((resolve, reject) => {
           const insertArticleQuery = `
-                        INSERT INTO commande_equipement (command_id, equipement_id, quantity)
-                        VALUES (?, ?, ?);
-                    `;
+            INSERT INTO commande_equipement (command_id, equipement_id, quantity)
+            VALUES (?, ?, ?);
+          `;
           db.query(
             insertArticleQuery,
             [commandId, article.equipement_id, article.quantity],
@@ -303,6 +453,68 @@ app.post("/api/ordre", (req, res) => {
         .catch((err) => {
           db.rollback(() => {
             console.error("Erreur lors de l'insertion des articles:", err);
+            res.status(500).json({ error: "Erreur de la base de données" });
+          });
+        });
+    });
+  });
+});
+
+app.put("/api/commandes/:commandId", (req, res) => {
+  const { commandId } = req.params;
+  const { articles } = req.body; // articles est un tableau d'objets { equipement_id, quantity }
+
+  // Démarrer une transaction
+  db.beginTransaction((err) => {
+    if (err) {
+      console.error("Erreur lors du début de la transaction :", err);
+      return res.status(500).json({ error: "Erreur de la base de données" });
+    }
+
+    // Supprimer les anciens enregistrements de commande_equipement pour cette commande
+    const deleteQuery = "DELETE FROM commande_equipement WHERE command_id = ?";
+    db.query(deleteQuery, [commandId], (err, results) => {
+      if (err) {
+        return db.rollback(() => {
+          console.error("Erreur lors de la suppression des anciens équipements :", err);
+          res.status(500).json({ error: "Erreur de la base de données" });
+        });
+      }
+
+      // Insérer les nouveaux équipements dans commande_equipement
+      const insertPromises = articles.map((article) => {
+        return new Promise((resolve, reject) => {
+          const insertQuery = `
+            INSERT INTO commande_equipement (command_id, equipement_id, quantity)
+            VALUES (?, ?, ?);
+          `;
+          db.query(insertQuery, [commandId, article.equipement_id, article.quantity], (err, results) => {
+            if (err) {
+              reject(err);
+            } else {
+              resolve(results);
+            }
+          });
+        });
+      });
+
+      // Exécuter toutes les insertions
+      Promise.all(insertPromises)
+        .then(() => {
+          // Valider la transaction
+          db.commit((err) => {
+            if (err) {
+              return db.rollback(() => {
+                console.error("Erreur lors de la validation de la transaction :", err);
+                res.status(500).json({ error: "Erreur de la base de données" });
+              });
+            }
+            res.json({ message: "Commande mise à jour avec succès" });
+          });
+        })
+        .catch((err) => {
+          db.rollback(() => {
+            console.error("Erreur lors de l'insertion des nouveaux équipements :", err);
             res.status(500).json({ error: "Erreur de la base de données" });
           });
         });
@@ -365,20 +577,91 @@ app.get("api/salles/:salle_id", (req, res) => {
 //////////////////////////////////////////////////////////
 // delete salle par id ajouté par Siriiiin
 //////////////////////////////////////////////////////////
-app.delete('api/salles/:salle_id', (req, res) => {
-    const { salle_id } = req.params.salle_id;
-    const query = 'DELETE FROM salle WHERE salle_id = ?';
-    db.query(query, [salle_id], (err, result) => {
-        if (err) {
-            console.error(err);
-            res.status(500).send('Error deleting the salle');
-        } else if (result.affectedRows === 0) {
-            res.status(404).send('Salle not found');
-        } else {
-            res.send('Salle deleted successfully');
-        }
-    });
+app.delete("/api/salles/:salle_id", (req, res) => {
+  const { salle_id } = req.params;
+
+  const query = "DELETE FROM salle WHERE salle_id = ?";
+  db.query(query, [salle_id], (err, results) => {
+    if (err) {
+      console.error("Erreur lors de la suppression de la salle:", err);
+      res.status(500).json({ error: "Erreur de la base de données" });
+    } else if (results.affectedRows === 0) {
+      res.status(404).json({ error: "Salle non trouvée" });
+    } else {
+      res.json({ message: "Salle supprimée avec succès" });
+    }
+  });
 });
+
+app.post("/api/salles", (req, res) => {
+  const { nom_Salle } = req.body; // Supprimer capacite
+
+  const query = "INSERT INTO salle (nom_Salle) VALUES (?)"; // Supprimer capacite de la requête SQL
+  db.query(query, [nom_Salle], (err, results) => {
+    if (err) {
+      console.error("Erreur lors de l'ajout de la salle:", err);
+      res.status(500).json({ error: "Erreur de la base de données" });
+    } else {
+      res.json({ message: "Salle ajoutée avec succès" });
+    }
+  });
+});
+////////////////////////////////////////////////////////////////
+// GET SALLE PAR ID AJOUTE PAR SIRIN
+////////////////////////////////////////////////////////////////
+app.get("/api/salles/:salle_id", (req, res) => {
+  const { salle_id } = req.params;
+
+  const query = `
+    SELECT 
+      salle.salle_id, 
+      salle.nom_Salle, 
+      salle.local_id,
+      locale.nom_Local
+    FROM 
+      salle
+    JOIN 
+      locale 
+    ON 
+      salle.local_id = locale.local_id
+    WHERE 
+      salle.salle_id = ?;
+  `;
+
+  db.query(query, [salle_id], (err, results) => {
+    if (err) {
+      console.error("Erreur lors de la récupération de la salle:", err);
+      res.status(500).json({ error: "Erreur de la base de données" });
+    } else if (results.length === 0) {
+      res.status(404).json({ error: "Salle non trouvée" });
+    } else {
+      res.json(results[0]); // Renvoyer les détails de la salle, y compris les informations du local
+    }
+  });
+});
+
+////////////////////////////////////////////////////////////////
+// PUT SALLE PAR ID AJOUTE PAR SIRIN
+////////////////////////////////////////////////////////////////
+app.put("/api/salles/:salle_id", (req, res) => {
+  const { salle_id } = req.params; // Récupérer l'ID de la salle depuis les paramètres de la requête
+  const { nom_Salle, local_id } = req.body; // Récupérer le nouveau nom de la salle et l'ID du local depuis le corps de la requête
+
+  // Requête SQL pour mettre à jour la salle avec le nom et l'ID du local
+  const query = "UPDATE salle SET nom_Salle = ?, local_id = ? WHERE salle_id = ?";
+
+  db.query(query, [nom_Salle, local_id, salle_id], (err, results) => {
+    if (err) {
+      console.error("Erreur lors de la mise à jour de la salle:", err);
+      res.status(500).json({ error: "Erreur de la base de données" });
+    } else if (results.affectedRows === 0) {
+      res.status(404).json({ error: "Salle non trouvée" }); // Si aucune salle n'est trouvée
+    } else {
+      res.json({ message: "Salle mise à jour avec succès" }); // Réponse de succès
+    }
+  });
+});
+
 
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
