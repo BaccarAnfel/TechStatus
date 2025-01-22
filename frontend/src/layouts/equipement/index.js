@@ -10,6 +10,12 @@ import AddEquipement from "./components/addEquipement";
 
 function Equipement() {
   const [showAddEquipement, setShowAddEquipement] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0); // État pour forcer le rafraîchissement
+
+  // Fonction pour rafraîchir la table des équipements
+  const refreshEquipements = () => {
+    setRefreshKey((prevKey) => prevKey + 1); // Incrémenter la clé pour forcer le rafraîchissement
+  };
 
   return (
     <DashboardLayout>
@@ -30,14 +36,20 @@ function Equipement() {
 
         {/* Formulaire d'ajout d'équipement */}
         {showAddEquipement && (
-          <AddEquipement onCancel={() => setShowAddEquipement(false)} />
+          <AddEquipement
+            onCancel={() => setShowAddEquipement(false)}
+            onEquipementAdded={() => {
+              setShowAddEquipement(false); // Masquer le formulaire
+              refreshEquipements(); // Rafraîchir la table des équipements
+            }}
+          />
         )}
 
         {/* Tableau des équipements */}
         <Card>
           <SoftBox p={3}>
             <SoftTypography variant="h6">
-              <EquipementTable />
+              <EquipementTable key={refreshKey} /> {/* Utiliser la clé pour forcer le rafraîchissement */}
             </SoftTypography>
           </SoftBox>
         </Card>

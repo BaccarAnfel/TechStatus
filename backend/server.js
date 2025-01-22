@@ -594,15 +594,21 @@ app.delete("/api/salles/:salle_id", (req, res) => {
 });
 
 app.post("/api/salles", (req, res) => {
-  const { nom_Salle } = req.body; // Supprimer capacite
+  const { nom_Salle, local_id } = req.body; // Récupérer nom_Salle et local_id depuis le corps de la requête
 
-  const query = "INSERT INTO salle (nom_Salle) VALUES (?)"; // Supprimer capacite de la requête SQL
-  db.query(query, [nom_Salle], (err, results) => {
+  // Vérifier que les champs obligatoires sont présents
+  if (!nom_Salle || !local_id) {
+    return res.status(400).json({ error: "Veuillez fournir un nom de salle et un local_id" });
+  }
+
+  // Requête SQL pour insérer une nouvelle salle avec local_id
+  const query = "INSERT INTO salle (nom_Salle, local_id) VALUES (?, ?)";
+  db.query(query, [nom_Salle, local_id], (err, results) => {
     if (err) {
       console.error("Erreur lors de l'ajout de la salle:", err);
       res.status(500).json({ error: "Erreur de la base de données" });
     } else {
-      res.json({ message: "Salle ajoutée avec succès" });
+      res.json({ message: "Salle ajoutée avec succès", salle_id: results.insertId });
     }
   });
 });

@@ -8,7 +8,7 @@ import SoftButton from "components/SoftButton";
 
 function AjoutLocal({ onCancel, onLocalAdded }) {
   const [local, setLocal] = useState({
-    nom_Local: "", // Supprimer le champ capacite
+    nom_Local: "",
   });
 
   const handleChange = (e) => {
@@ -21,7 +21,6 @@ function AjoutLocal({ onCancel, onLocalAdded }) {
 
   const handleSubmit = async () => {
     if (!local.nom_Local) {
-      // Supprimer la validation de capacite
       alert("Veuillez remplir tous les champs.");
       return;
     }
@@ -32,7 +31,7 @@ function AjoutLocal({ onCancel, onLocalAdded }) {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(local), // Envoyer uniquement nom_Local
+        body: JSON.stringify(local),
       });
 
       if (response.ok) {
@@ -104,9 +103,10 @@ function AjoutLocal({ onCancel, onLocalAdded }) {
   );
 }
 
+// Validation des props
 AjoutLocal.propTypes = {
   onCancel: PropTypes.func.isRequired, // onCancel est une fonction obligatoire
-  onLocalAdded: PropTypes.func, // onLocalAdded est optionnelle
+  onLocalAdded: PropTypes.func.isRequired, // onLocalAdded est une fonction obligatoire
 };
 
 export default AjoutLocal;

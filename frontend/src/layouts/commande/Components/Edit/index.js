@@ -54,7 +54,11 @@ function EditCommande() {
       try {
         const response = await fetch("http://localhost:5000/api/equipements");
         const data = await response.json();
-        setEquipements(data);
+        const equipementsDisponibles = data.filter(
+          (equipement) => equipement.status === "Disponible"
+        );
+
+        setEquipements(equipementsDisponibles);
       } catch (error) {
         console.error("Erreur lors de la récupération des équipements:", error);
       }

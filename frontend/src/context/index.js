@@ -3,7 +3,6 @@ import { createContext, useContext, useReducer, useMemo } from "react";
 // prop-types is a library for typechecking of props
 import PropTypes from "prop-types";
 
-// The Soft UI Dashboard PRO Material main context
 const SoftUI = createContext(null);
 
 // Setting custom name for the context which is visible on react dev tools

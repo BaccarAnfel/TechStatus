@@ -1,22 +1,21 @@
-// @mui material components
+import React, { useState, useCallback } from "react";
 import Card from "@mui/material/Card";
-import React, { useState } from "react";
-
-// Soft UI Dashboard React components
 import SoftBox from "components/SoftBox";
 import SoftTypography from "components/SoftTypography";
 import SoftButton from "components/SoftButton";
-
-// Soft UI Dashboard React examples
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
-
-// Composants personnalisés
 import SalleTable from "./components/salleTable";
 import AddSalle from "./components/addSalle";
 
 function Salle() {
-  const [showAddSalle, setShowAddSalle] = useState(false); // État pour afficher/masquer le formulaire d'ajout
+  const [showAddSalle, setShowAddSalle] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0); // État pour forcer le rafraîchissement
+
+  // Fonction pour rafraîchir la table des salles
+  const refreshSalles = useCallback(() => {
+    setRefreshKey((prevKey) => prevKey + 1); // Incrémenter la clé pour forcer le rafraîchissement
+  }, []);
 
   return (
     <DashboardLayout>
@@ -37,14 +36,20 @@ function Salle() {
 
         {/* Formulaire d'ajout de salle */}
         {showAddSalle && (
-          <AddSalle onCancel={() => setShowAddSalle(false)} />
+          <AddSalle
+            onCancel={() => setShowAddSalle(false)}
+            onSalleAdded={() => {
+              setShowAddSalle(false); // Masquer le formulaire
+              refreshSalles(); // Rafraîchir la table des salles
+            }}
+          />
         )}
 
         {/* Tableau des salles */}
         <Card>
           <SoftBox p={3}>
             <SoftTypography variant="h6">
-              <SalleTable />
+              <SalleTable key={refreshKey} /> {/* Utiliser la clé pour forcer le rafraîchissement */}
             </SoftTypography>
           </SoftBox>
         </Card>

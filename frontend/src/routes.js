@@ -9,6 +9,7 @@ import EditCommande from "layouts/commande/Components/Edit";
 import Shop from "examples/Icons/Shop";
 import Settings from "examples/Icons/Settings";
 import Document from "examples/Icons/Document";
+import SpaceShip from "examples/Icons/SpaceShip";
 import CustomerSupport from "examples/Icons/CustomerSupport";
 import Basket from "examples/Icons/Basket";
 import Cube from "examples/Icons/Cube";
@@ -18,6 +19,8 @@ import EditEquipement from "layouts/equipement/components/EditEquipement";
 import EditLocaux from "layouts/locaux/components/editLocaux";
 import EditSalle from "layouts/salle/components/editSalle";
 import PrintCommande from "layouts/commande/Components/Imprimer";
+import SignIn from "layouts/authentication/sign-in";
+import SignUp from "layouts/authentication/sign-up";
 
 const routes = [
   {
@@ -114,6 +117,7 @@ const routes = [
     component: <PrintCommande />, // Composant pour éditer la commande
     noCollapse: true,
   },
+
 ];
 
 export default routes;

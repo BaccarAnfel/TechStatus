@@ -7,7 +7,13 @@ import Ordre from "./Components/Order";
 import CommandeTable from "./Components/tableCommande";
 
 function Commande() {
-  const [showAddOrder, setShowAddOrder] = useState(false); // État pour gérer la visibilité du formulaire
+  const [showAddOrder, setShowAddOrder] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0); // État pour forcer le rafraîchissement
+
+  // Fonction pour rafraîchir la table des commandes
+  const refreshCommandes = () => {
+    setRefreshKey((prevKey) => prevKey + 1); // Incrémenter la clé pour forcer le rafraîchissement
+  };
 
   return (
     <DashboardLayout>
@@ -19,7 +25,7 @@ function Commande() {
             <SoftButton
               variant="gradient"
               color="dark"
-              onClick={() => setShowAddOrder(true)} // Afficher le formulaire
+              onClick={() => setShowAddOrder(true)}
             >
               Ajouter une commande
             </SoftButton>
@@ -29,13 +35,19 @@ function Commande() {
         {/* Formulaire d'ajout de commande */}
         {showAddOrder && (
           <SoftBox mb={3}>
-            <Ordre onCancel={() => setShowAddOrder(false)} /> {/* Passer une fonction pour annuler */}
+            <Ordre
+              onCancel={() => setShowAddOrder(false)}
+              onSuccess={() => {
+                setShowAddOrder(false); // Masquer le formulaire
+                refreshCommandes(); // Rafraîchir la table des commandes
+              }}
+            />
           </SoftBox>
         )}
 
         {/* Tableau des commandes */}
         <SoftBox mb={3}>
-          <CommandeTable />
+          <CommandeTable key={refreshKey} /> {/* Utiliser la clé pour forcer le rafraîchissement */}
         </SoftBox>
       </SoftBox>
     </DashboardLayout>
