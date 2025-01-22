@@ -52,7 +52,7 @@ function LocauxTable() {
 
   return (
 
-              <SoftBox px={3}>
+              <SoftBox >
                 <SoftTypography variant="h6" fontWeight="bold" mb={2}>
                   Table des locaux
                 </SoftTypography>

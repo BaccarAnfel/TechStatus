@@ -52,10 +52,10 @@ function SalleTable() {
   }
 
   return (
-          <Card>
-            <SoftBox p={3} sx={{ paddingTop: "50px" }}>
+          // <Card>
+            <SoftBox>
               {/* Ajouter un espace après chaque table */}
-              <SoftBox mb={4}> {/* Espace de 16px (theme.spacing(4)) après la table Salle */}
+              <SoftBox>
                 <SoftTypography variant="h6" fontWeight="bold" mb={2}>
                   Table des Salles
                 </SoftTypography>
@@ -175,7 +175,7 @@ function SalleTable() {
                 </table>
               </SoftBox>
             </SoftBox>
-          </Card>
+          // </Card>
   );
 }
 

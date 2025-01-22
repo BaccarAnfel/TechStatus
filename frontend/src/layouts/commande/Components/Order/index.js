@@ -79,7 +79,7 @@ function Ordre() {
           </SoftBox>
 
           {articles.map((article, index) => (
-            <SoftBox key={index} display="flex" justifyContent="space-between" ml={3} mr={3} mt={2}>
+            <SoftBox key={index} display="flex" justifyContent="space-between" ml={3} mr={3} mt={1}>
               <SoftBox flex={1} mr={3}>
               <Select
                     labelId="equipement-label"
@@ -119,7 +119,7 @@ function Ordre() {
           <SoftBox mb={3} display="flex" justifyContent="space-around" alignItems="stretch">
             <SoftBox>
               <SoftButton
-                sx={{ width: (theme) => theme.spacing(70) }}
+                sx={{ width: (theme) => theme.spacing(69) }}
                 variant="gradient"
                 color="secondary"
                 fullWidth
@@ -130,7 +130,7 @@ function Ordre() {
             </SoftBox>
             <SoftBox>
               <SoftButton
-                sx={{ width: (theme) => theme.spacing(70) }}
+                sx={{ width: (theme) => theme.spacing(69) }}
                 variant="gradient"
                 color="secondary"
                 fullWidth

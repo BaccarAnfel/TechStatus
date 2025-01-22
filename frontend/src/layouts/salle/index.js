@@ -9,24 +9,26 @@ import SoftTypography from "components/SoftTypography";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import SalleTable from "./components/salleTable";
+import AddSalle from "./components/addSalle";
 
 function Salle() {
-
   return (
     <DashboardLayout>
       <DashboardNavbar />
       <SoftBox py={3}>
-          <Card>
-            <SoftBox p={3} sx={{ paddingTop: "50px" }}>
-              <SoftBox mb={4}> {/* Espace de 16px (theme.spacing(4)) après la table Locaux */}
-                <SoftTypography variant="h6">
-                  <SalleTable/>
-                </SoftTypography>
-              </SoftBox>
-
+        <AddSalle />
+        <Card>
+          <SoftBox p={3}>
+            <SoftBox>
+              {" "}
+              {/* Espace de 16px (theme.spacing(4)) après la table Locaux */}
+              <SoftTypography variant="h6">
+                <SalleTable />
+              </SoftTypography>
             </SoftBox>
-          </Card>
-        </SoftBox>
+          </SoftBox>
+        </Card>
+      </SoftBox>
     </DashboardLayout>
   );
 }

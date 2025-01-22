@@ -19,8 +19,8 @@ function Equipement() {
       <DashboardNavbar />
       <SoftBox py={3}>
           <Card>
-            <SoftBox p={3} sx={{ paddingTop: "50px" }}>
-              <SoftBox mb={4}> {/* Espace de 16px (theme.spacing(4)) après la table Locaux */}
+            <SoftBox p={3} >
+              <SoftBox> {/* Espace de 16px (theme.spacing(4)) après la table Locaux */}
                 <SoftTypography variant="h6">
                   <EquipementTable/>
                 </SoftTypography>

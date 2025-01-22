@@ -15,6 +15,10 @@ import Shop from "examples/Icons/Shop";
 import Settings from "examples/Icons/Settings";
 import Document from "examples/Icons/Document";
 import CustomerSupport from "examples/Icons/CustomerSupport";
+import Basket from "examples/Icons/Basket";
+import Cube from "examples/Icons/Cube";
+import Map from "examples/Icons/Map";
+import Office from "examples/Icons/Office";
 
 
 const routes = [
@@ -29,19 +33,19 @@ const routes = [
   },
   {
     type: "collapse",
-    name: "Commande",
-    key: "Commande",
-    route: "/Commande",
-    icon: <Document size="12px"/>,
+    name: "Commandes",
+    key: "Commandes",
+    route: "/Commandes",
+    icon: <Basket size="12px"/>,
     component: <Commande />,
     noCollapse: true,
   },
   {
     type: "collapse",
-    name: "Equipement",
-    key: "equipement",
-    route: "/equipement",
-    icon: <Document size="12px" />,
+    name: "Equipements",
+    key: "equipements",
+    route: "/equipements",
+    icon: <Settings size="12px" />,
     component: <Equipement />,
     noCollapse: true,
   },
@@ -50,16 +54,16 @@ const routes = [
     name: "Locaux",
     key: "locaux",
     route: "/locaux",
-    icon: <Document size="12px" />,
+    icon: <Map size="12px" />,
     component: <Locaux />,
     noCollapse: true,
   },
   {
     type: "collapse",
-    name: "Salle",
-    key: "Salle",
-    route: "/salle",
-    icon: <Document size="12px" />,
+    name: "Salles",
+    key: "Salles",
+    route: "/salles",
+    icon: <Office size="12px" />,
     component: <Salle />,
     noCollapse: true,
   },
