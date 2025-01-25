@@ -16,7 +16,9 @@ function EditEquipement() {
   const [equipement, setEquipement] = useState({
     nom_Equipement: "",
     status: "",
+    salle_id: "", // Ajout de salle_id
   });
+  const [salles, setSalles] = useState([]); // État pour stocker la liste des salles
   const [loading, setLoading] = useState(true);
 
   // Récupérer les données de l'équipement
@@ -35,6 +37,21 @@ function EditEquipement() {
 
     fetchEquipementData();
   }, [equipement_id]);
+
+  // Récupérer la liste des salles depuis l'API
+  useEffect(() => {
+    const fetchSalles = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/api/salles");
+        const data = await response.json();
+        setSalles(data);
+      } catch (error) {
+        console.error("Erreur lors de la récupération des salles :", error);
+      }
+    };
+
+    fetchSalles();
+  }, []);
 
   // Gérer la modification des champs du formulaire
   const handleInputChange = (e) => {
@@ -83,13 +100,13 @@ function EditEquipement() {
         <Card>
           <SoftBox display="flex" justifyContent="space-between" alignItems="center" p={3}>
             <SoftTypography variant="h6" fontWeight="bold">
-              Modifier equipement
+              Modifier équipement
             </SoftTypography>
           </SoftBox>
           <SoftBox flexWrap="wrap" display="flex" justifyContent="space-between" ml={3} mr={3}>
             <SoftBox flex={1} mr={3}>
               <SoftTypography variant="h6" mb={1}>
-                Nom de equipement
+                Nom de équipement
               </SoftTypography>
               <SoftInput
                 icon={{ direction: "left" }}
@@ -101,7 +118,7 @@ function EditEquipement() {
                 fullWidth
               />
             </SoftBox>
-            <SoftBox flex={1} >
+            <SoftBox flex={1} mr={3}>
               <SoftTypography variant="h6" mb={1}>
                 Statut
               </SoftTypography>
@@ -118,6 +135,27 @@ function EditEquipement() {
                 <MenuItem value="En Maintenance">En Maintenance</MenuItem>
                 <MenuItem value="En Utilisation">En Utilisation</MenuItem>
                 <MenuItem value="Disponible">Disponible</MenuItem>
+              </Select>
+            </SoftBox>
+            <SoftBox flex={1} mr={3}>
+              <SoftTypography variant="h6" mb={1}>
+                Salle
+              </SoftTypography>
+              <Select
+                name="salle_id"
+                value={equipement.salle_id || ""}
+                onChange={handleInputChange}
+                displayEmpty
+                fullWidth
+              >
+                <MenuItem value="" disabled>
+                  Selectionner une salle
+                </MenuItem>
+                {salles.map((salle) => (
+                  <MenuItem key={salle.salle_id} value={salle.salle_id}>
+                    {salle.nom_Salle}
+                  </MenuItem>
+                ))}
               </Select>
             </SoftBox>
           </SoftBox>

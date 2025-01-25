@@ -1,5 +1,5 @@
 import Card from "@mui/material/Card";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types"; // Importer PropTypes
 import SoftBox from "components/SoftBox";
 import SoftTypography from "components/SoftTypography";
@@ -12,7 +12,31 @@ function AddEquipement({ onCancel, onEquipementAdded }) {
   const [equipement, setEquipement] = useState({
     nom_equipement: "",
     status: "",
+    salle_id: "", // Ajout de salle_id
   });
+
+  const [salles, setSalles] = useState([]); // État pour stocker la liste des salles
+  const [loading, setLoading] = useState(true); // État pour gérer le chargement des salles
+
+  // Récupérer la liste des salles depuis l'API
+  useEffect(() => {
+    const fetchSalles = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/api/salles");
+        if (!response.ok) {
+          throw new Error("Erreur lors de la récupération des salles");
+        }
+        const data = await response.json();
+        setSalles(data);
+        setLoading(false);
+      } catch (error) {
+        console.error("Erreur lors de la récupération des salles:", error);
+        setLoading(false);
+      }
+    };
+
+    fetchSalles();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -44,6 +68,7 @@ function AddEquipement({ onCancel, onEquipementAdded }) {
         setEquipement({
           nom_equipement: "",
           status: "",
+          salle_id: "", // Réinitialiser salle_id
         });
         // Masquer le formulaire après la soumission
         if (onCancel) onCancel();
@@ -64,6 +89,7 @@ function AddEquipement({ onCancel, onEquipementAdded }) {
     setEquipement({
       nom_equipement: "",
       status: "",
+      salle_id: "", // Réinitialiser salle_id
     });
     // Masquer le formulaire
     if (onCancel) onCancel();
@@ -102,6 +128,25 @@ function AddEquipement({ onCancel, onEquipementAdded }) {
               <MenuItem value="En Maintenance">En Maintenance</MenuItem>
               <MenuItem value="En Utilisation">En Utilisation</MenuItem>
               <MenuItem value="Disponible">Disponible</MenuItem>
+            </Select>
+          </SoftBox>
+          <SoftBox flex={1} mr={3}>
+            <Select
+              name="salle_id"
+              value={equipement.salle_id}
+              onChange={handleChange}
+              displayEmpty
+              fullWidth
+              disabled={loading} // Désactiver le Select pendant le chargement
+            >
+              <MenuItem value="" disabled>
+                {loading ? "Chargement des salles..." : "Sélectionner une salle"}
+              </MenuItem>
+              {salles.map((salle) => (
+                <MenuItem key={salle.salle_id} value={salle.salle_id}>
+                  {salle.nom_Salle} 
+                </MenuItem>
+              ))}
             </Select>
           </SoftBox>
         </SoftBox>

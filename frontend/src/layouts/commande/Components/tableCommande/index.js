@@ -3,26 +3,29 @@ import React, { useEffect, useState } from "react";
 import SoftBox from "components/SoftBox";
 import SoftTypography from "components/SoftTypography";
 import { useNavigate } from "react-router-dom";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import PrintIcon from "@mui/icons-material/Print";
+import ArchiveIcon from "@mui/icons-material/Archive";
+import IconButton from "@mui/material/IconButton";
 
 function CommandeTable() {
-  const [commandes, setCommandes] = useState([]); // State pour stocker les données des commandes
-  const [loading, setLoading] = useState(true); // State pour gérer le chargement
+  const [commandes, setCommandes] = useState([]);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  // Récupérer les données des commandes au chargement du composant
   useEffect(() => {
     const fetchCommandesData = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/commandes"); // Endpoint API pour les commandes
+        const response = await fetch("http://localhost:5000/api/commandes");
         const data = await response.json();
         console.log("Données récupérées:", data);
 
-        // Vérifier que les données sont un tableau
         if (Array.isArray(data)) {
           setCommandes(data);
         } else {
           console.error("Expected an array but got:", data);
-          setCommandes([]); // Fallback à un tableau vide
+          setCommandes([]);
         }
 
         setLoading(false);
@@ -35,7 +38,6 @@ function CommandeTable() {
     fetchCommandesData();
   }, []);
 
-  // Fonction pour supprimer une commande
   const handleDeleteCommande = async (commandId) => {
     try {
       const response = await fetch(`http://localhost:5000/api/commandesDel/${commandId}`, {
@@ -43,7 +45,6 @@ function CommandeTable() {
       });
 
       if (response.ok) {
-        // Mettre à jour la liste des commandes après suppression
         setCommandes(commandes.filter((commande) => commande.command_id !== commandId));
         console.log("Commande supprimée avec succès !");
       } else {
@@ -51,6 +52,23 @@ function CommandeTable() {
       }
     } catch (error) {
       console.error("Erreur lors de la suppression de la commande :", error);
+    }
+  };
+
+  const handleArchiveCommande = async (commandId) => {
+    try {
+      const response = await fetch(`http://localhost:5000/api/commandesArchive/${commandId}`, {
+        method: "POST", // Ou "PUT" selon votre API
+      });
+
+      if (response.ok) {
+        console.log("Commande archivée avec succès !");
+        // Mettre à jour l'état local si nécessaire
+      } else {
+        console.error("Erreur lors de l'archivage de la commande");
+      }
+    } catch (error) {
+      console.error("Erreur lors de l'archivage de la commande :", error);
     }
   };
 
@@ -76,7 +94,7 @@ function CommandeTable() {
     <Card>
       <SoftBox p={3}>
         <SoftTypography variant="h6" fontWeight="bold" mb={2}>
-          {`Table des Commandes`} {/* Titre de la table */}
+          {`Table des Commandes`}
         </SoftTypography>
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <thead>
@@ -164,7 +182,7 @@ function CommandeTable() {
                     borderBottom: index !== commandes.length - 1 ? "1px solid #e0e0e0" : "none",
                   }}
                 >
-                  {commande.statut || "N/A"} {/* Afficher le statut ou "N/A" si null */}
+                  {commande.status_cmd || "N/A"}
                 </td>
                 <td
                   style={{
@@ -174,7 +192,7 @@ function CommandeTable() {
                     borderBottom: index !== commandes.length - 1 ? "1px solid #e0e0e0" : "none",
                   }}
                 >
-                  {commande.nom_utilisateur} {/* Afficher le nom de l'utilisateur */}
+                  {commande.nom_utilisateur}
                 </td>
                 <td
                   style={{
@@ -195,53 +213,39 @@ function CommandeTable() {
                     borderBottom: index !== commandes.length - 1 ? "1px solid #e0e0e0" : "none",
                   }}
                 >
-                  <SoftTypography
-                    component="a"
-                    href="#"
-                    variant="caption"
+                  {/* Bouton Modifier - Désactivé si la commande est terminée */}
+                  <IconButton
+                    color="primary"
+                    onClick={() => navigate(`/edit-commande/${commande.command_id}`)}
+                    disabled={commande.status_cmd === "Terminée"} // Désactiver si la commande est terminée
+                  >
+                    <EditIcon />
+                  </IconButton>
+
+                  {/* Bouton Supprimer - Désactivé si la commande n'est pas terminée */}
+                  <IconButton
+                    color="error"
+                    onClick={() => handleDeleteCommande(commande.command_id)}
+                    disabled={commande.status_cmd !== "Terminée"} // Désactiver si la commande n'est pas terminée
+                  >
+                    <DeleteIcon />
+                  </IconButton>
+
+                  {/* Boutons Imprimer et Archiver - Désactivés si la commande n'est pas terminée */}
+                  <IconButton
                     color="secondary"
-                    fontWeight="medium"
-                    style={{
-                      textDecoration: "underline",
-                      cursor: "pointer",
-                      color: "#5e72e4",
-                      marginRight: "10px", // Espace entre les boutons
-                    }}
-                    onClick={() => navigate(`/edit-commande/${commande.command_id}`)} // Redirige vers la page d'édition
-                  >
-                    Modifier
-                  </SoftTypography>
-                  <SoftTypography
-                    component="a"
-                    href="#"
-                    variant="caption"
-                    color="error"
-                    fontWeight="medium"
-                    style={{
-                      textDecoration: "underline",
-                      cursor: "pointer",
-                      color: "#f5365c",
-                      marginRight: "10px",
-                    }}
-                    onClick={() => handleDeleteCommande(commande.command_id)} // Supprime la commande
-                  >
-                    Supprimer
-                  </SoftTypography>
-                  <SoftTypography
-                    component="a"
-                    href="#"
-                    variant="caption"
-                    color="error"
-                    fontWeight="medium"
-                    style={{
-                      textDecoration: "underline",
-                      cursor: "pointer",
-                      color: "#f5365c", // Couleur rouge pour le bouton Supprimer
-                    }}
                     onClick={() => navigate(`/commandes/${commande.command_id}/print`)}
+                    disabled={commande.status_cmd !== "Terminée"} // Désactiver si la commande n'est pas terminée
                   >
-                    Imprimer
-                  </SoftTypography>
+                    <PrintIcon />
+                  </IconButton>
+                  <IconButton
+                    color="info"
+                    onClick={() => handleArchiveCommande(commande.command_id)}
+                    disabled={commande.status_cmd !== "Terminée"} // Désactiver si la commande n'est pas terminée
+                  >
+                    <ArchiveIcon />
+                  </IconButton>
                 </td>
               </tr>
             ))}

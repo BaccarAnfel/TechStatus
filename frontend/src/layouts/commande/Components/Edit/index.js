@@ -152,7 +152,7 @@ function EditCommande() {
 
         {/* Afficher les articles de la commande */}
         {articles.map((article, index) => (
-          <SoftBox key={index} display="flex" justifyContent="space-between" ml={3} >
+          <SoftBox key={index} display="flex" justifyContent="space-between" ml={3} mb={2}>
             <SoftBox flex={1}>
               <Select
                 labelId="equipement-label"

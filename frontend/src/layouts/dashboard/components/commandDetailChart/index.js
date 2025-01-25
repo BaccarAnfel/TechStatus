@@ -4,13 +4,17 @@ import { Modal, Box, Typography, CircularProgress } from "@mui/material";
 
 const OrderDetailsModal = ({ open, onClose, command_id }) => {
   const [order, setOrder] = useState(null);
+  const [equipements, setEquipements] = useState([]); // État pour stocker les équipements de la commande
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Fetch order details from the database when the modal is opened
+  // Fetch order details and associated equipment from the database when the modal is opened
   useEffect(() => {
     if (open && command_id) {
       setLoading(true);
+      setError(null);
+
+      // Fetch order details
       fetch(`http://localhost:5000/api/commandes/${command_id}`)
         .then((response) => {
           if (!response.ok) {
@@ -20,10 +24,22 @@ const OrderDetailsModal = ({ open, onClose, command_id }) => {
         })
         .then((data) => {
           setOrder(data);
+
+          // Fetch equipment details from commande_equipment table
+          return fetch(`http://localhost:5000/api/commande_equipment/${command_id}`);
+        })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Failed to fetch equipment details");
+          }
+          return response.json();
+        })
+        .then((data) => {
+          setEquipements(data); // Set the equipment list
           setLoading(false);
         })
         .catch((error) => {
-          console.error("Error fetching order details:", error);
+          console.error("Error fetching order or equipment details:", error);
           setError(error.message);
           setLoading(false);
         });
@@ -57,9 +73,9 @@ const OrderDetailsModal = ({ open, onClose, command_id }) => {
             <Typography>Statut: {order.statut}</Typography>
             <Typography>Équipements:</Typography>
             <ul>
-              {order.equipements.map((item, index) => (
+              {equipements.map((item, index) => (
                 <li key={index}>
-                  {item.nom} - Quantité: {item.quantite}
+                  {item.nom_Equipement} - Quantité: {item.quantity}
                 </li>
               ))}
             </ul>
@@ -76,7 +92,7 @@ const OrderDetailsModal = ({ open, onClose, command_id }) => {
 OrderDetailsModal.propTypes = {
   open: PropTypes.bool.isRequired, // `open` must be a boolean and is required
   onClose: PropTypes.func.isRequired, // `onClose` must be a function and is required
-  command_id: PropTypes.number, // `orderId` is optional and must be a number
+  command_id: PropTypes.number, // `command_id` is optional and must be a number
 };
 
 export default OrderDetailsModal;

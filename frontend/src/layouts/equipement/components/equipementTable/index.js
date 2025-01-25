@@ -114,7 +114,7 @@ function EquipementTable() {
                 borderBottom: "1px solid #e0e0e0",
               }}
             >
-              COMMAND ID
+              SALLE
             </th>
             <th
               style={{
@@ -173,7 +173,7 @@ function EquipementTable() {
                   borderBottom: index !== equipements.length - 1 ? "1px solid #e0e0e0" : "none",
                 }}
               >
-                {equipement.command_id}
+                {equipement.salle_id || "N/A"} {/* Display salle_id or "N/A" if null */}
               </td>
               <td
                 style={{

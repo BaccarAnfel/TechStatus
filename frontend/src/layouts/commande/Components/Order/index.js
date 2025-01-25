@@ -1,88 +1,77 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Card from "@mui/material/Card";
 import SoftBox from "components/SoftBox";
 import SoftTypography from "components/SoftTypography";
-import SoftInput from "components/SoftInput";
 import SoftButton from "components/SoftButton";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
-import PropTypes from "prop-types"; // Importer PropTypes
+import Autocomplete from "@mui/material/Autocomplete";
+import TextField from "@mui/material/TextField";
+import PropTypes from "prop-types";
 
 function Ordre({ onCancel, onSuccess }) {
-  const [articles, setArticles] = useState([{ equipement_id: "", quantity: "" }]);
-  const [equipements, setEquipements] = useState([]);
-  const [status, setStatus] = useState("En cours");
+  const [articles, setArticles] = useState([{ nom_Equipement: "", quantity: "", status_equipement: "Disponible" }]);
+  const [status_cmd, setStatusCmd] = useState("En cours");
 
-  // Récupérer la liste des équipements disponibles
-  useEffect(() => {
-    const fetchEquipements = async () => {
-      try {
-        const response = await fetch("http://localhost:5000/api/equipements");
-        const data = await response.json();
+  // Liste statique des équipements prédéfinis
+  const equipementsPredefinis = ["Vidéo projecteur", "Imprimante", "Ordinateur"];
 
-        // Filtrer les équipements disponibles
-        const equipementsDisponibles = data.filter(
-          (equipement) => equipement.status === "Disponible"
-        );
-
-        setEquipements(equipementsDisponibles); // Mettre à jour l'état avec les équipements disponibles
-      } catch (error) {
-        console.error("Erreur lors de la récupération des équipements:", error);
-      }
-    };
-
-    fetchEquipements();
-  }, []);
-
-  // Ajouter un nouvel article
   const handleAddArticle = () => {
-    setArticles([...articles, { equipement_id: "", quantity: "" }]);
+    setArticles([...articles, { nom_Equipement: "", quantity: "", status_equipement: "Disponible" }]);
   };
 
-  // Changer l'équipement sélectionné
   const handleEquipementChange = (index, value) => {
     const newArticles = [...articles];
-    newArticles[index].equipement_id = value;
+    newArticles[index].nom_Equipement = value;
     setArticles(newArticles);
   };
 
-  // Changer la quantité
   const handleQuantityChange = (index, value) => {
     const newArticles = [...articles];
     newArticles[index].quantity = value;
     setArticles(newArticles);
   };
 
-  // Changer le statut
   const handleStatusChange = (value) => {
-    setStatus(value);
+    setStatusCmd(value);
   };
 
-  // Soumettre la commande
   const handleSubmit = async () => {
     try {
-      const response = await fetch("http://localhost:5000/api/ordre", {
+      const articlesToSend = articles.map((article) => ({
+        nom_Equipement: article.nom_Equipement,
+        quantity: article.quantity,
+        status_equipement: article.status_equipement,
+      }));
+
+      const commandeResponse = await fetch("http://localhost:5000/api/commande", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ articles, status }),
+        body: JSON.stringify({
+          date: new Date().toISOString().split("T")[0],
+          status_cmd: status_cmd,
+          articles: articlesToSend,
+        }),
       });
 
-      if (response.ok) {
-        console.log("Commande enregistrée avec succès !");
-        setArticles([{ equipement_id: "", quantity: "" }]); // Réinitialiser les articles
-        setStatus("En cours"); // Réinitialiser le statut
-        alert("Commande enregistrée avec succès !");
-        onSuccess(); // Appeler onSuccess pour rafraîchir la table des commandes
-      } else {
-        console.error("Erreur lors de l'enregistrement de la commande");
-        alert("Erreur lors de l'enregistrement de la commande");
+      if (!commandeResponse.ok) {
+        throw new Error("Erreur lors de la création de la commande");
       }
+
+      const commandeData = await commandeResponse.json();
+      const commandId = commandeData.command_id;
+
+      console.log("Commande et équipements créés avec succès !");
+      setArticles([{ nom_Equipement: "", quantity: "", status_equipement: "Disponible" }]);
+      setStatusCmd("En cours");
+      alert("Commande enregistrée avec succès !");
+      onSuccess();
     } catch (error) {
-      console.error("Erreur lors de l'envoi de la commande:", error);
-      alert("Erreur lors de l'envoi de la commande");
+      console.error("Erreur lors de l'enregistrement de la commande:", error);
+      alert("Erreur lors de l'enregistrement de la commande");
     }
   };
 
@@ -92,11 +81,10 @@ function Ordre({ onCancel, onSuccess }) {
         <SoftTypography variant="h6">Passer une commande</SoftTypography>
       </SoftBox>
 
-      {/* Champ pour le statut */}
       <SoftBox ml={3} mr={3} mt={1}>
         <FormControl fullWidth>
           <Select
-            value={status}
+            value={status_cmd}
             onChange={(e) => handleStatusChange(e.target.value)}
             displayEmpty
             inputProps={{ "aria-label": "Statut" }}
@@ -107,32 +95,28 @@ function Ordre({ onCancel, onSuccess }) {
         </FormControl>
       </SoftBox>
 
-      {/* Liste des articles */}
       {articles.map((article, index) => (
         <SoftBox key={index} display="flex" justifyContent="space-between" ml={3} mr={3} mt={2} mb={2}>
           <SoftBox flex={1} mr={2}>
             <FormControl fullWidth>
-              <Select
-                value={article.equipement_id}
-                onChange={(e) => handleEquipementChange(index, e.target.value)}
-                displayEmpty
-                inputProps={{ "aria-label": "Équipement" }}
-              >
-                <MenuItem value="" disabled>
-                  Choisir un équipement
-                </MenuItem>
-                {equipements.map((equipement, i) => (
-                  <MenuItem key={i} value={equipement.equipement_id}>
-                    {equipement.nom_Equipement}
-                  </MenuItem>
-                ))}
-              </Select>
+              <Autocomplete
+                freeSolo
+                options={equipementsPredefinis}
+                value={article.nom_Equipement}
+                onChange={(event, newValue) => handleEquipementChange(index, newValue)}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    placeholder="Nom de l'équipement"
+                    onChange={(e) => handleEquipementChange(index, e.target.value)}
+                  />
+                )}
+              />
             </FormControl>
           </SoftBox>
 
           <SoftBox flex={1} ml={2}>
-            <SoftInput
-              icon={{ direction: "left" }}
+            <TextField
               type="number"
               placeholder="Quantité"
               value={article.quantity}
@@ -143,14 +127,12 @@ function Ordre({ onCancel, onSuccess }) {
         </SoftBox>
       ))}
 
-      {/* Bouton pour ajouter un autre article */}
       <SoftBox ml={3} mr={3} mb={2}>
         <SoftButton variant="gradient" color="dark" fullWidth onClick={handleAddArticle}>
           Ajouter un autre article
         </SoftButton>
       </SoftBox>
 
-      {/* Boutons Annuler et Soumettre */}
       <SoftBox mb={3} display="flex" justifyContent="space-around" alignItems="stretch">
         <SoftBox>
           <SoftButton
@@ -158,7 +140,7 @@ function Ordre({ onCancel, onSuccess }) {
             variant="gradient"
             color="secondary"
             fullWidth
-            onClick={onCancel} // Appeler onCancel pour fermer le formulaire
+            onClick={onCancel}
           >
             Annuler
           </SoftButton>
@@ -179,10 +161,9 @@ function Ordre({ onCancel, onSuccess }) {
   );
 }
 
-// Validation des props
 Ordre.propTypes = {
-  onCancel: PropTypes.func.isRequired, // onCancel est une fonction obligatoire
-  onSuccess: PropTypes.func.isRequired, // onSuccess est une fonction obligatoire
+  onCancel: PropTypes.func.isRequired,
+  onSuccess: PropTypes.func.isRequired,
 };
 
 export default Ordre;
