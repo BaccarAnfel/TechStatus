@@ -4,33 +4,38 @@ import SoftBox from "components/SoftBox";
 import SoftTypography from "components/SoftTypography";
 import { useNavigate } from "react-router-dom";
 import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
-import PrintIcon from "@mui/icons-material/Print";
-import ArchiveIcon from "@mui/icons-material/Archive";
 import IconButton from "@mui/material/IconButton";
+import Alert from "@mui/material/Alert";
+import ArchiveIcon from "@mui/icons-material/Archive";
 
 function CommandeTable() {
-  const [commandes, setCommandes] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [commandes, setCommandes] = useState([]); // State pour stocker les données des commandes
+  const [loading, setLoading] = useState(true); // State pour le chargement
+  const [error, setError] = useState(null); // State pour les erreurs
+  const [success, setSuccess] = useState(null); // State pour les messages de succès
   const navigate = useNavigate();
 
+  // Récupérer les données des commandes au chargement du composant
   useEffect(() => {
     const fetchCommandesData = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/commandes");
+        const response = await fetch("http://localhost:5000/api/commandes"); // API pour récupérer les commandes
         const data = await response.json();
         console.log("Données récupérées:", data);
 
         if (Array.isArray(data)) {
-          setCommandes(data);
+          // Trier les commandes par command_id
+          const sortedCommandes = data.sort((a, b) => a.command_id - b.command_id);
+          setCommandes(sortedCommandes);
         } else {
           console.error("Expected an array but got:", data);
-          setCommandes([]);
+          setCommandes([]); // Fallback à un tableau vide
         }
 
         setLoading(false);
       } catch (error) {
         console.error("Erreur lors de la récupération des données :", error);
+        setError("Erreur lors de la récupération des données");
         setLoading(false);
       }
     };
@@ -38,37 +43,23 @@ function CommandeTable() {
     fetchCommandesData();
   }, []);
 
-  const handleDeleteCommande = async (commandId) => {
+  // Fonction pour archiver une commande
+  const handleArchive = async (commandId) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/commandesDel/${commandId}`, {
-        method: "DELETE",
+      const response = await fetch(`http://localhost:5000/api/commandes/archive/${commandId}`, {
+        method: "PUT",
       });
-
       if (response.ok) {
-        setCommandes(commandes.filter((commande) => commande.command_id !== commandId));
-        console.log("Commande supprimée avec succès !");
+        setSuccess("Commande archivée avec succès");
+        // Retirer la commande archivée de la liste
+        const updatedCommandes = commandes.filter((commande) => commande.command_id !== commandId);
+        setCommandes(updatedCommandes);
       } else {
-        console.error("Erreur lors de la suppression de la commande");
+        setError("Erreur lors de l'archivage de la commande");
       }
     } catch (error) {
-      console.error("Erreur lors de la suppression de la commande :", error);
-    }
-  };
-
-  const handleArchiveCommande = async (commandId) => {
-    try {
-      const response = await fetch(`http://localhost:5000/api/commandesArchive/${commandId}`, {
-        method: "POST", // Ou "PUT" selon votre API
-      });
-
-      if (response.ok) {
-        console.log("Commande archivée avec succès !");
-        // Mettre à jour l'état local si nécessaire
-      } else {
-        console.error("Erreur lors de l'archivage de la commande");
-      }
-    } catch (error) {
-      console.error("Erreur lors de l'archivage de la commande :", error);
+      console.error("Erreur lors de l'archivage :", error);
+      setError("Erreur lors de l'archivage de la commande");
     }
   };
 
@@ -96,9 +87,34 @@ function CommandeTable() {
         <SoftTypography variant="h6" fontWeight="bold" mb={2}>
           {`Table des Commandes`}
         </SoftTypography>
+
+        {/* Affichage des messages d'erreur ou de succès */}
+        {error && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {error}
+          </Alert>
+        )}
+        {success && (
+          <Alert severity="success" sx={{ mb: 2 }}>
+            {success}
+          </Alert>
+        )}
+
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <thead>
             <tr>
+              <th
+                style={{
+                  textAlign: "left",
+                  padding: "10px 15px",
+                  color: "#8392ab",
+                  fontWeight: "bold",
+                  fontSize: "14px",
+                  borderBottom: "1px solid #e0e0e0",
+                }}
+              >
+                N°
+              </th>
               <th
                 style={{
                   textAlign: "left",
@@ -133,7 +149,7 @@ function CommandeTable() {
                   borderBottom: "1px solid #e0e0e0",
                 }}
               >
-                Utilisateur
+                UTILISATEUR
               </th>
               <th
                 style={{
@@ -172,7 +188,7 @@ function CommandeTable() {
                     borderBottom: index !== commandes.length - 1 ? "1px solid #e0e0e0" : "none",
                   }}
                 >
-                  {commande.command_id}
+                  {index + 1} {/* Numéro d'ordre séquentiel */}
                 </td>
                 <td
                   style={{
@@ -182,7 +198,7 @@ function CommandeTable() {
                     borderBottom: index !== commandes.length - 1 ? "1px solid #e0e0e0" : "none",
                   }}
                 >
-                  {commande.status_cmd || "N/A"}
+                  {commande.command_id} {/* ID de la commande */}
                 </td>
                 <td
                   style={{
@@ -192,7 +208,7 @@ function CommandeTable() {
                     borderBottom: index !== commandes.length - 1 ? "1px solid #e0e0e0" : "none",
                   }}
                 >
-                  {commande.nom_utilisateur}
+                  {commande.status_cmd || "N/A"} {/* Statut de la commande */}
                 </td>
                 <td
                   style={{
@@ -202,7 +218,17 @@ function CommandeTable() {
                     borderBottom: index !== commandes.length - 1 ? "1px solid #e0e0e0" : "none",
                   }}
                 >
-                  {commande.date}
+                  {commande.nom_utilisateur || "N/A"} {/* Nom de l'utilisateur */}
+                </td>
+                <td
+                  style={{
+                    padding: "10px 15px",
+                    fontSize: "14px",
+                    color: "#344767",
+                    borderBottom: index !== commandes.length - 1 ? "1px solid #e0e0e0" : "none",
+                  }}
+                >
+                  {commande.date || "N/A"} {/* Date de la commande */}
                 </td>
                 <td
                   style={{
@@ -213,36 +239,19 @@ function CommandeTable() {
                     borderBottom: index !== commandes.length - 1 ? "1px solid #e0e0e0" : "none",
                   }}
                 >
-                  {/* Bouton Modifier - Désactivé si la commande est terminée */}
+                  {/* Bouton Modifier */}
                   <IconButton
                     color="primary"
                     onClick={() => navigate(`/edit-commande/${commande.command_id}`)}
-                    disabled={commande.status_cmd === "Terminée"} // Désactiver si la commande est terminée
                   >
                     <EditIcon />
                   </IconButton>
 
-                  {/* Bouton Supprimer - Désactivé si la commande n'est pas terminée */}
-                  <IconButton
-                    color="error"
-                    onClick={() => handleDeleteCommande(commande.command_id)}
-                    disabled={commande.status_cmd !== "Terminée"} // Désactiver si la commande n'est pas terminée
-                  >
-                    <DeleteIcon />
-                  </IconButton>
-
-                  {/* Boutons Imprimer et Archiver - Désactivés si la commande n'est pas terminée */}
-                  <IconButton
-                    color="secondary"
-                    onClick={() => navigate(`/commandes/${commande.command_id}/print`)}
-                    disabled={commande.status_cmd !== "Terminée"} // Désactiver si la commande n'est pas terminée
-                  >
-                    <PrintIcon />
-                  </IconButton>
+                  {/* Bouton Archiver - Désactivé si le statut n'est pas "Terminée" */}
                   <IconButton
                     color="info"
-                    onClick={() => handleArchiveCommande(commande.command_id)}
-                    disabled={commande.status_cmd !== "Terminée"} // Désactiver si la commande n'est pas terminée
+                    onClick={() => handleArchive(commande.command_id)}
+                    disabled={commande.status_cmd !== "Terminée"} // Désactiver si le statut n'est pas "Terminée"
                   >
                     <ArchiveIcon />
                   </IconButton>

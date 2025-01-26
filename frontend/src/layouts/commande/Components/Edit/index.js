@@ -11,12 +11,15 @@ import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 
 function EditCommande() {
-  const { commandId } = useParams(); // Récupérer l'ID de la commande depuis l'URL
+  const { commandId } = useParams();
   const navigate = useNavigate();
-  const [articles, setArticles] = useState([]); // État pour les articles de la commande
-  const [equipements, setEquipements] = useState([]); // État pour la liste des équipements disponibles
-  const [loading, setLoading] = useState(true); // État pour le chargement
-  const [error, setError] = useState(null); // État pour les erreurs
+  const [articles, setArticles] = useState([]);
+  const [statusCmd, setStatusCmd] = useState("En cours"); // Statut de la commande
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Liste statique des équipements prédéfinis
+  const equipementsPredefinis = ["Vidéo projecteur", "Imprimante", "Ordinateur portable", "Tableau blanc"];
 
   // Récupérer les détails de la commande depuis l'API
   useEffect(() => {
@@ -27,16 +30,23 @@ function EditCommande() {
           throw new Error("Commande non trouvée");
         }
         const data = await response.json();
-        console.log("Données de la commande:", data); // Afficher les données dans la console
+        console.log("Données de la commande:", data);
 
-        // Mettre à jour les articles avec les équipements de la commande
-        setArticles(
-          data.equipements.map((equipement) => ({
-            equipement_id: equipement.equipement_id, // Assurez-vous que c'est la bonne clé
+        // Récupérer le statut de la commande
+        setStatusCmd(data.status_cmd);
+
+        // Correction de la méthode articlesAvecEquipementsValides
+        const articlesAvecEquipementsValides = data.equipements
+          .filter((equipement) => equipement.nom_Equipement) // Ignorer les équipements sans nom
+          .map((equipement) => ({
+            nom_Equipement: equipementsPredefinis.includes(equipement.nom_Equipement.trim())
+              ? equipement.nom_Equipement.trim() // Utiliser le nom tel quel s'il est valide
+              : "", // Remplacer par une chaîne vide pour les équipements non reconnus
             quantity: equipement.quantity,
-            nom_Equipement: equipement.nom_Equipement || "Non spécifié", // Assurez-vous que c'est la bonne clé
-          }))
-        );
+          }));
+
+        console.log("Articles avec équipements valides:", articlesAvecEquipementsValides);
+        setArticles(articlesAvecEquipementsValides);
         setLoading(false);
       } catch (error) {
         console.error("Erreur lors de la récupération de la commande:", error);
@@ -48,32 +58,10 @@ function EditCommande() {
     fetchCommande();
   }, [commandId]);
 
-  // Récupérer la liste des équipements disponibles
-  useEffect(() => {
-    const fetchEquipements = async () => {
-      try {
-        const response = await fetch("http://localhost:5000/api/equipements");
-        const data = await response.json();
-        const equipementsDisponibles = data.filter(
-          (equipement) => equipement.status === "Disponible"
-        );
-
-        setEquipements(equipementsDisponibles);
-      } catch (error) {
-        console.error("Erreur lors de la récupération des équipements:", error);
-      }
-    };
-
-    fetchEquipements();
-  }, []);
-
   // Gérer le changement d'équipement
   const handleEquipementChange = (index, value) => {
     const newArticles = [...articles];
-    const selectedEquipement = equipements.find((equipement) => equipement.equipement_id === value);
-
-    newArticles[index].equipement_id = value;
-    newArticles[index].nom_Equipement = selectedEquipement ? selectedEquipement.nom_Equipement : "";
+    newArticles[index].nom_Equipement = value;
     setArticles(newArticles);
   };
 
@@ -84,9 +72,14 @@ function EditCommande() {
     setArticles(newArticles);
   };
 
+  // Gérer le changement de statut de la commande
+  const handleStatusChange = (value) => {
+    setStatusCmd(value);
+  };
+
   // Ajouter un nouvel article à la commande
   const handleAddArticle = () => {
-    setArticles([...articles, { equipement_id: "", quantity: 1, nom_Equipement: "" }]);
+    setArticles([...articles, { nom_Equipement: "", quantity: 1 }]);
   };
 
   // Supprimer un article de la commande
@@ -108,12 +101,12 @@ function EditCommande() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ articles }),
+        body: JSON.stringify({ articles, status_cmd: statusCmd }), // Envoyer les articles et le statut
       });
 
       if (response.ok) {
         alert("Commande mise à jour avec succès !");
-        navigate("/commandes"); // Rediriger vers la liste des commandes
+        navigate("/commandes");
       } else {
         console.error("Erreur lors de la mise à jour de la commande");
       }
@@ -150,13 +143,28 @@ function EditCommande() {
           <SoftTypography variant="h6">Éditer la commande #{commandId}</SoftTypography>
         </SoftBox>
 
+        {/* Champ pour modifier le statut de la commande */}
+        <SoftBox display="flex" justifyContent="space-between" ml={3} mb={2}>
+          <SoftBox flex={1}>
+            <Select
+              labelId="status-label"
+              value={statusCmd}
+              onChange={(e) => handleStatusChange(e.target.value)}
+              fullWidth
+            >
+              <MenuItem value="En cours">En cours</MenuItem>
+              <MenuItem value="Terminée">Terminée</MenuItem>
+            </Select>
+          </SoftBox>
+        </SoftBox>
+
         {/* Afficher les articles de la commande */}
         {articles.map((article, index) => (
           <SoftBox key={index} display="flex" justifyContent="space-between" ml={3} mb={2}>
             <SoftBox flex={1}>
               <Select
                 labelId="equipement-label"
-                value={article.equipement_id || ""}
+                value={article.nom_Equipement || ""}
                 onChange={(e) => handleEquipementChange(index, e.target.value)}
                 displayEmpty
                 fullWidth
@@ -164,9 +172,9 @@ function EditCommande() {
                 <MenuItem value="" disabled>
                   Sélectionner un équipement
                 </MenuItem>
-                {equipements.map((equipement) => (
-                  <MenuItem key={equipement.equipement_id} value={equipement.equipement_id}>
-                    {equipement.nom_Equipement}
+                {equipementsPredefinis.map((equipement, i) => (
+                  <MenuItem key={i} value={equipement}>
+                    {equipement}
                   </MenuItem>
                 ))}
               </Select>

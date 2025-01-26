@@ -15,7 +15,7 @@ function Ordre({ onCancel, onSuccess }) {
   const [status_cmd, setStatusCmd] = useState("En cours");
 
   // Liste statique des équipements prédéfinis
-  const equipementsPredefinis = ["Vidéo projecteur", "Imprimante", "Ordinateur"];
+  const equipementsPredefinis = ["Vidéo projecteur", "Imprimante", "Ordinateur portable", "Tableau blanc"];
 
   const handleAddArticle = () => {
     setArticles([...articles, { nom_Equipement: "", quantity: "", status_equipement: "Disponible" }]);
@@ -90,7 +90,6 @@ function Ordre({ onCancel, onSuccess }) {
             inputProps={{ "aria-label": "Statut" }}
           >
             <MenuItem value="En cours">En cours</MenuItem>
-            <MenuItem value="Terminée">Terminée</MenuItem>
           </Select>
         </FormControl>
       </SoftBox>

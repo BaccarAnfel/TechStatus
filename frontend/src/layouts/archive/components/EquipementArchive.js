@@ -3,29 +3,28 @@ import React, { useEffect, useState } from "react";
 import SoftBox from "components/SoftBox";
 import SoftTypography from "components/SoftTypography";
 import { useNavigate } from "react-router-dom";
-import EditIcon from "@mui/icons-material/Edit";
 import IconButton from "@mui/material/IconButton";
 import Alert from "@mui/material/Alert";
-import ArchiveIcon from "@mui/icons-material/Archive";
+import RestoreIcon from "@mui/icons-material/Restore"; // Icon for restoring archived equipment
 
-function EquipementTable() {
-  const [equipements, setEquipements] = useState([]); // State for storing equipment data
+function EquipementArchive() {
+  const [equipements, setEquipements] = useState([]); // State for storing archived equipment data
   const [loading, setLoading] = useState(true); // Loading state
   const [error, setError] = useState(null); // State for error messages
   const [success, setSuccess] = useState(null); // State for success messages
   const navigate = useNavigate();
 
-  // Fetch equipment data on component load
+  // Fetch archived equipment data on component load
   useEffect(() => {
-    const fetchEquipementData = async () => {
+    const fetchArchivedEquipementData = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/equipements-filtre"); // Fetch non-archived equipment
+        const response = await fetch("http://localhost:5000/api/equipements/archived"); // Update API endpoint
         const data = await response.json();
-        console.log("Données récupérées:", data);
+        console.log("Données archivées récupérées:", data);
 
         // Ensure data is an array
         if (Array.isArray(data)) {
-          // Trier les équipements par equipement_id
+          // Sort archived equipment by equipement_id
           const sortedEquipements = data.sort((a, b) => a.equipement_id - b.equipement_id);
           setEquipements(sortedEquipements);
         } else {
@@ -35,34 +34,34 @@ function EquipementTable() {
 
         setLoading(false);
       } catch (error) {
-        console.error("Erreur lors de la récupération des données :", error);
-        setError("Erreur lors de la récupération des données");
+        console.error("Erreur lors de la récupération des données archivées :", error);
+        setError("Erreur lors de la récupération des données archivées");
         setLoading(false);
       }
     };
 
-    fetchEquipementData();
+    fetchArchivedEquipementData();
   }, []);
 
-  // Function to handle archiving an equipment
-  const handleArchive = async (equipement_id) => {
+  // Function to handle restoring an archived equipment
+  const handleRestore = async (equipement_id) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/equipements/archive/${equipement_id}`, {
+      const response = await fetch(`http://localhost:5000/api/equipements/restore/${equipement_id}`, {
         method: "PUT",
       });
       if (response.ok) {
-        setSuccess("Équipement archivé avec succès");
-        // Remove the archived equipment from the list
+        setSuccess("Équipement restauré avec succès");
+        // Refresh the archived equipment list
         const updatedEquipements = equipements.filter(
           (equipement) => equipement.equipement_id !== equipement_id
         );
         setEquipements(updatedEquipements);
       } else {
-        setError("Erreur lors de l'archivage de l'équipement");
+        setError("Erreur lors de la restauration de l'équipement");
       }
     } catch (error) {
-      console.error("Erreur lors de l'archivage :", error);
-      setError("Erreur lors de l'archivage de l'équipement");
+      console.error("Erreur lors de la restauration :", error);
+      setError("Erreur lors de la restauration de l'équipement");
     }
   };
 
@@ -88,7 +87,7 @@ function EquipementTable() {
     <Card>
       <SoftBox p={3}>
         <SoftTypography variant="h6" fontWeight="bold" mb={2}>
-          {`Table des Équipements`}
+          Table des Équipements Archivés
         </SoftTypography>
 
         {/* Affichage des messages d'erreur ou de succès */}
@@ -264,22 +263,12 @@ function EquipementTable() {
                     borderBottom: index !== equipements.length - 1 ? "1px solid #e0e0e0" : "none",
                   }}
                 >
-                  {/* Bouton Modifier - Désactivé si le statut est "Non Exploitable" */}
-                  <IconButton
-                    color="primary"
-                    onClick={() => navigate(`/edit-equipement/${equipement.equipement_id}`)}
-                    disabled={equipement.status_equipement === "Non Exploitable"} // Désactiver si le statut est "Non Exploitable"
-                  >
-                    <EditIcon />
-                  </IconButton>
-
-                  {/* Bouton Archiver - Désactivé si le statut est "Non Exploitable" */}
+                  {/* Bouton Restaurer */}
                   <IconButton
                     color="info"
-                    onClick={() => handleArchive(equipement.equipement_id)}
-                    disabled={equipement.status_equipement !== "Non Exploitable"} // Désactiver si le statut est "Non Exploitable"
+                    onClick={() => handleRestore(equipement.equipement_id)}
                   >
-                    <ArchiveIcon />
+                    <RestoreIcon />
                   </IconButton>
                 </td>
               </tr>
@@ -291,4 +280,4 @@ function EquipementTable() {
   );
 }
 
-export default EquipementTable;
+export default EquipementArchive;

@@ -4,7 +4,6 @@ import { Modal, Box, Typography, CircularProgress } from "@mui/material";
 
 const OrderDetailsModal = ({ open, onClose, command_id }) => {
   const [order, setOrder] = useState(null);
-  const [equipements, setEquipements] = useState([]); // État pour stocker les équipements de la commande
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -14,7 +13,7 @@ const OrderDetailsModal = ({ open, onClose, command_id }) => {
       setLoading(true);
       setError(null);
 
-      // Fetch order details
+      // Fetch order details and associated equipment
       fetch(`http://localhost:5000/api/commandes/${command_id}`)
         .then((response) => {
           if (!response.ok) {
@@ -23,23 +22,11 @@ const OrderDetailsModal = ({ open, onClose, command_id }) => {
           return response.json();
         })
         .then((data) => {
-          setOrder(data);
-
-          // Fetch equipment details from commande_equipment table
-          return fetch(`http://localhost:5000/api/commande_equipment/${command_id}`);
-        })
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error("Failed to fetch equipment details");
-          }
-          return response.json();
-        })
-        .then((data) => {
-          setEquipements(data); // Set the equipment list
+          setOrder(data); // Set the order details and associated equipment
           setLoading(false);
         })
         .catch((error) => {
-          console.error("Error fetching order or equipment details:", error);
+          console.error("Error fetching order details:", error);
           setError(error.message);
           setLoading(false);
         });
@@ -70,12 +57,12 @@ const OrderDetailsModal = ({ open, onClose, command_id }) => {
           <>
             <Typography variant="h6">Détails de la Commande #{order.command_id}</Typography>
             <Typography>Date: {order.date}</Typography>
-            <Typography>Statut: {order.statut}</Typography>
+            <Typography>Statut: {order.status_cmd}</Typography>
             <Typography>Équipements:</Typography>
             <ul>
-              {equipements.map((item, index) => (
+              {order.equipements.map((equipement, index) => (
                 <li key={index}>
-                  {item.nom_Equipement} - Quantité: {item.quantity}
+                  {equipement.nom_Equipement} - Quantité: {equipement.quantity}
                 </li>
               ))}
             </ul>

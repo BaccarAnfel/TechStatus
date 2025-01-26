@@ -21,6 +21,8 @@ import EditSalle from "layouts/salle/components/editSalle";
 import PrintCommande from "layouts/commande/Components/Imprimer";
 import SignIn from "layouts/authentication/sign-in";
 import SignUp from "layouts/authentication/sign-up";
+import ArchiveIcon from "@mui/icons-material/Archive";
+import Archive from "layouts/archive";
 
 const routes = [
   {
@@ -75,6 +77,15 @@ const routes = [
     route: "/profile",
     icon: <CustomerSupport size="12px" />,
     component: <Profile />,
+    noCollapse: true,
+  },
+  {
+    type: "collapse",
+    name: "archive",
+    key: "archive",
+    route: "/archive",
+    icon: <ArchiveIcon size="12px" />,
+    component: <Archive />,
     noCollapse: true,
   },
   {

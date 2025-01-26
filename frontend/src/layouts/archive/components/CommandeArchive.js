@@ -3,66 +3,63 @@ import React, { useEffect, useState } from "react";
 import SoftBox from "components/SoftBox";
 import SoftTypography from "components/SoftTypography";
 import { useNavigate } from "react-router-dom";
-import EditIcon from "@mui/icons-material/Edit";
 import IconButton from "@mui/material/IconButton";
+import RestoreIcon from "@mui/icons-material/Restore"; // Icône pour restaurer une commande archivée
 import Alert from "@mui/material/Alert";
-import ArchiveIcon from "@mui/icons-material/Archive";
 
-function EquipementTable() {
-  const [equipements, setEquipements] = useState([]); // State for storing equipment data
-  const [loading, setLoading] = useState(true); // Loading state
-  const [error, setError] = useState(null); // State for error messages
-  const [success, setSuccess] = useState(null); // State for success messages
+function CommandeArchive() {
+  const [commandes, setCommandes] = useState([]); // State pour stocker les commandes archivées
+  const [loading, setLoading] = useState(true); // State pour le chargement
+  const [error, setError] = useState(null); // State pour les erreurs
+  const [success, setSuccess] = useState(null); // State pour les messages de succès
   const navigate = useNavigate();
 
-  // Fetch equipment data on component load
+  // Récupérer les commandes archivées au chargement du composant
   useEffect(() => {
-    const fetchEquipementData = async () => {
+    const fetchCommandesArchiveData = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/equipements-filtre"); // Fetch non-archived equipment
+        const response = await fetch("http://localhost:5000/api/commandeArchiver");
         const data = await response.json();
-        console.log("Données récupérées:", data);
+        console.log("Données archivées récupérées:", data);
 
-        // Ensure data is an array
         if (Array.isArray(data)) {
-          // Trier les équipements par equipement_id
-          const sortedEquipements = data.sort((a, b) => a.equipement_id - b.equipement_id);
-          setEquipements(sortedEquipements);
+          // Trier les commandes par command_id
+          const sortedCommandes = data.sort((a, b) => a.command_id - b.command_id);
+          setCommandes(sortedCommandes);
         } else {
           console.error("Expected an array but got:", data);
-          setEquipements([]); // Fallback to an empty array
+          setCommandes([]); // Fallback à un tableau vide
         }
 
         setLoading(false);
       } catch (error) {
-        console.error("Erreur lors de la récupération des données :", error);
-        setError("Erreur lors de la récupération des données");
+        console.error("Erreur lors de la récupération des données archivées :", error);
+        setError("Erreur lors de la récupération des données archivées");
         setLoading(false);
       }
     };
 
-    fetchEquipementData();
+    fetchCommandesArchiveData();
   }, []);
 
-  // Function to handle archiving an equipment
-  const handleArchive = async (equipement_id) => {
+  // Fonction pour restaurer une commande archivée
+  const handleRestore = async (commandId) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/equipements/archive/${equipement_id}`, {
-        method: "PUT",
+      const response = await fetch(`http://localhost:5000/api/commandes/restore/${commandId}`, {
+        method: "PUT", // Méthode HTTP pour restaurer
       });
+
       if (response.ok) {
-        setSuccess("Équipement archivé avec succès");
-        // Remove the archived equipment from the list
-        const updatedEquipements = equipements.filter(
-          (equipement) => equipement.equipement_id !== equipement_id
-        );
-        setEquipements(updatedEquipements);
+        setSuccess("Commande restaurée avec succès");
+        // Mettre à jour la liste des commandes archivées
+        const updatedCommandes = commandes.filter((commande) => commande.command_id !== commandId);
+        setCommandes(updatedCommandes);
       } else {
-        setError("Erreur lors de l'archivage de l'équipement");
+        setError("Erreur lors de la restauration de la commande");
       }
     } catch (error) {
-      console.error("Erreur lors de l'archivage :", error);
-      setError("Erreur lors de l'archivage de l'équipement");
+      console.error("Erreur lors de la restauration :", error);
+      setError("Erreur lors de la restauration de la commande");
     }
   };
 
@@ -74,7 +71,7 @@ function EquipementTable() {
     );
   }
 
-  if (!Array.isArray(equipements)) {
+  if (!Array.isArray(commandes)) {
     return (
       <SoftBox py={3}>
         <SoftTypography variant="h6" color="error">
@@ -88,7 +85,7 @@ function EquipementTable() {
     <Card>
       <SoftBox p={3}>
         <SoftTypography variant="h6" fontWeight="bold" mb={2}>
-          {`Table des Équipements`}
+          Table des Commandes Archivées
         </SoftTypography>
 
         {/* Affichage des messages d'erreur ou de succès */}
@@ -128,7 +125,7 @@ function EquipementTable() {
                   borderBottom: "1px solid #e0e0e0",
                 }}
               >
-                NOM DE L&apos;ÉQUIPEMENT
+                ID DE COMMANDE
               </th>
               <th
                 style={{
@@ -140,7 +137,7 @@ function EquipementTable() {
                   borderBottom: "1px solid #e0e0e0",
                 }}
               >
-                STATUS ÉQUIPEMENT
+                STATUT
               </th>
               <th
                 style={{
@@ -152,7 +149,7 @@ function EquipementTable() {
                   borderBottom: "1px solid #e0e0e0",
                 }}
               >
-                SALLE
+                Utilisateur
               </th>
               <th
                 style={{
@@ -164,19 +161,7 @@ function EquipementTable() {
                   borderBottom: "1px solid #e0e0e0",
                 }}
               >
-                ID DE L&apos;ÉQUIPEMENT
-              </th>
-              <th
-                style={{
-                  textAlign: "left",
-                  padding: "10px 15px",
-                  color: "#8392ab",
-                  fontWeight: "bold",
-                  fontSize: "14px",
-                  borderBottom: "1px solid #e0e0e0",
-                }}
-              >
-                ID DE LA COMMANDE
+                DATE DE COMMANDE
               </th>
               <th
                 style={{
@@ -193,14 +178,14 @@ function EquipementTable() {
             </tr>
           </thead>
           <tbody>
-            {equipements.map((equipement, index) => (
-              <tr key={equipement.equipement_id}>
+            {commandes.map((commande, index) => (
+              <tr key={commande.command_id}>
                 <td
                   style={{
                     padding: "10px 15px",
                     fontSize: "14px",
                     color: "#344767",
-                    borderBottom: index !== equipements.length - 1 ? "1px solid #e0e0e0" : "none",
+                    borderBottom: index !== commandes.length - 1 ? "1px solid #e0e0e0" : "none",
                   }}
                 >
                   {index + 1} {/* Numéro d'ordre séquentiel */}
@@ -210,50 +195,40 @@ function EquipementTable() {
                     padding: "10px 15px",
                     fontSize: "14px",
                     color: "#344767",
-                    borderBottom: index !== equipements.length - 1 ? "1px solid #e0e0e0" : "none",
+                    borderBottom: index !== commandes.length - 1 ? "1px solid #e0e0e0" : "none",
                   }}
                 >
-                  {equipement.nom_Equipement} {/* Afficher le nom de l'équipement */}
+                  {commande.command_id} {/* ID réel de la commande */}
                 </td>
                 <td
                   style={{
                     padding: "10px 15px",
                     fontSize: "14px",
                     color: "#344767",
-                    borderBottom: index !== equipements.length - 1 ? "1px solid #e0e0e0" : "none",
+                    borderBottom: index !== commandes.length - 1 ? "1px solid #e0e0e0" : "none",
                   }}
                 >
-                  {equipement.status_equipement || "N/A"} {/* Afficher le statut de l'équipement */}
+                  {commande.status_cmd || "N/A"}
                 </td>
                 <td
                   style={{
                     padding: "10px 15px",
                     fontSize: "14px",
                     color: "#344767",
-                    borderBottom: index !== equipements.length - 1 ? "1px solid #e0e0e0" : "none",
+                    borderBottom: index !== commandes.length - 1 ? "1px solid #e0e0e0" : "none",
                   }}
                 >
-                  {equipement.nom_salle || "N/A"} {/* Utilisation de nom_salle */}
+                  {commande.nom_utilisateur}
                 </td>
                 <td
                   style={{
                     padding: "10px 15px",
                     fontSize: "14px",
                     color: "#344767",
-                    borderBottom: index !== equipements.length - 1 ? "1px solid #e0e0e0" : "none",
+                    borderBottom: index !== commandes.length - 1 ? "1px solid #e0e0e0" : "none",
                   }}
                 >
-                  {equipement.equipement_id} {/* Afficher l'ID de l'équipement */}
-                </td>
-                <td
-                  style={{
-                    padding: "10px 15px",
-                    fontSize: "14px",
-                    color: "#344767",
-                    borderBottom: index !== equipements.length - 1 ? "1px solid #e0e0e0" : "none",
-                  }}
-                >
-                  {equipement.command_id || "N/A"} {/* Afficher l'ID de la commande */}
+                  {commande.date}
                 </td>
                 <td
                   style={{
@@ -261,25 +236,12 @@ function EquipementTable() {
                     textAlign: "center",
                     fontSize: "14px",
                     color: "#344767",
-                    borderBottom: index !== equipements.length - 1 ? "1px solid #e0e0e0" : "none",
+                    borderBottom: index !== commandes.length - 1 ? "1px solid #e0e0e0" : "none",
                   }}
                 >
-                  {/* Bouton Modifier - Désactivé si le statut est "Non Exploitable" */}
-                  <IconButton
-                    color="primary"
-                    onClick={() => navigate(`/edit-equipement/${equipement.equipement_id}`)}
-                    disabled={equipement.status_equipement === "Non Exploitable"} // Désactiver si le statut est "Non Exploitable"
-                  >
-                    <EditIcon />
-                  </IconButton>
-
-                  {/* Bouton Archiver - Désactivé si le statut est "Non Exploitable" */}
-                  <IconButton
-                    color="info"
-                    onClick={() => handleArchive(equipement.equipement_id)}
-                    disabled={equipement.status_equipement !== "Non Exploitable"} // Désactiver si le statut est "Non Exploitable"
-                  >
-                    <ArchiveIcon />
+                  {/* Bouton Restaurer */}
+                  <IconButton color="info" onClick={() => handleRestore(commande.command_id)}>
+                    <RestoreIcon />
                   </IconButton>
                 </td>
               </tr>
@@ -291,4 +253,4 @@ function EquipementTable() {
   );
 }
 
-export default EquipementTable;
+export default CommandeArchive;
