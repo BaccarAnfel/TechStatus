@@ -3,6 +3,9 @@ import React, { useEffect, useState } from "react";
 import SoftBox from "components/SoftBox";
 import SoftTypography from "components/SoftTypography";
 import { useNavigate } from "react-router-dom"; // Importer useNavigate
+import IconButton from "@mui/material/IconButton"; // Importer IconButton
+import EditIcon from "@mui/icons-material/Edit"; // Importer l'icône de modification
+import DeleteIcon from "@mui/icons-material/Delete"; // Importer l'icône de suppression
 
 function SalleTable() {
   const [salles, setSalles] = useState([]); // State pour stocker les données des salles
@@ -177,37 +180,21 @@ function SalleTable() {
                   borderBottom: index !== salles.length - 1 ? "1px solid #e0e0e0" : "none",
                 }}
               >
-                <SoftTypography
-                  component="a"
-                  href="#"
-                  variant="caption"
-                  color="secondary"
-                  fontWeight="medium"
-                  style={{
-                    textDecoration: "underline",
-                    cursor: "pointer",
-                    color: "#5e72e4",
-                    marginRight: "10px",
-                  }}
+                {/* Bouton Modifier */}
+                <IconButton
+                  color="primary"
                   onClick={() => handleEdit(salle.salle_id)} // Rediriger vers la page de modification
                 >
-                  Modifier
-                </SoftTypography>
-                <SoftTypography
-                  component="a"
-                  href="#"
-                  variant="caption"
+                  <EditIcon />
+                </IconButton>
+
+                {/* Bouton Supprimer */}
+                <IconButton
                   color="error"
-                  fontWeight="medium"
-                  style={{
-                    textDecoration: "underline",
-                    cursor: "pointer",
-                    color: "#f5365c",
-                  }}
                   onClick={() => handleDelete(salle.salle_id)} // Gérer la suppression
                 >
-                  Supprimer
-                </SoftTypography>
+                  <DeleteIcon />
+                </IconButton>
               </td>
             </tr>
           ))}

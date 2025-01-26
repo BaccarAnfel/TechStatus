@@ -2,6 +2,9 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom"; // Importer useNavigate
 import SoftBox from "components/SoftBox";
 import SoftTypography from "components/SoftTypography";
+import IconButton from "@mui/material/IconButton"; // Importer IconButton
+import EditIcon from "@mui/icons-material/Edit"; // Importer l'icône de modification
+import DeleteIcon from "@mui/icons-material/Delete"; // Importer l'icône de suppression
 
 function LocauxTable() {
   const [locaux, setLocaux] = useState([]); // State for storing location data
@@ -149,37 +152,21 @@ function LocauxTable() {
                   borderBottom: index !== locaux.length - 1 ? "1px solid #e0e0e0" : "none",
                 }}
               >
-                <SoftTypography
-                  component="a"
-                  href="#"
-                  variant="caption"
-                  color="secondary"
-                  fontWeight="medium"
-                  style={{
-                    textDecoration: "underline",
-                    cursor: "pointer",
-                    color: "#5e72e4",
-                    marginRight: "10px",
-                  }}
+                {/* Bouton Modifier */}
+                <IconButton
+                  color="primary"
                   onClick={() => navigate(`/edit-locaux/${locale.local_id}`)} // Rediriger vers EditLocaux
                 >
-                  Modifier
-                </SoftTypography>
-                <SoftTypography
-                  component="a"
-                  href="#"
-                  variant="caption"
+                  <EditIcon />
+                </IconButton>
+
+                {/* Bouton Supprimer */}
+                <IconButton
                   color="error"
-                  fontWeight="medium"
-                  style={{
-                    textDecoration: "underline",
-                    cursor: "pointer",
-                    color: "#f5365c",
-                  }}
                   onClick={() => handleDelete(locale.local_id)} // Gérer la suppression
                 >
-                  Supprimer
-                </SoftTypography>
+                  <DeleteIcon />
+                </IconButton>
               </td>
             </tr>
           ))}

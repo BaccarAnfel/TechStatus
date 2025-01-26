@@ -7,6 +7,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import IconButton from "@mui/material/IconButton";
 import Alert from "@mui/material/Alert";
 import ArchiveIcon from "@mui/icons-material/Archive";
+import PrintIcon from "@mui/icons-material/Print"; // Importer l'icône d'impression
 
 function CommandeTable() {
   const [commandes, setCommandes] = useState([]); // State pour stocker les données des commandes
@@ -61,6 +62,11 @@ function CommandeTable() {
       console.error("Erreur lors de l'archivage :", error);
       setError("Erreur lors de l'archivage de la commande");
     }
+  };
+
+  // Fonction pour rediriger vers le composant PrintCommande
+  const handlePrint = (commandId) => {
+    navigate(`/commandes/${commandId}/print`); // Rediriger vers PrintCommande avec l'ID de la commande
   };
 
   if (loading) {
@@ -254,6 +260,15 @@ function CommandeTable() {
                     disabled={commande.status_cmd !== "Terminée"} // Désactiver si le statut n'est pas "Terminée"
                   >
                     <ArchiveIcon />
+                  </IconButton>
+
+                  {/* Bouton Imprimer - Désactivé si le statut n'est pas "Terminée" */}
+                  <IconButton
+                    color="secondary"
+                    onClick={() => handlePrint(commande.command_id)}
+                    disabled={commande.status_cmd !== "Terminée"} // Désactiver si le statut n'est pas "Terminée"
+                  >
+                    <PrintIcon />
                   </IconButton>
                 </td>
               </tr>
