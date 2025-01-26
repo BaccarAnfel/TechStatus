@@ -85,8 +85,7 @@ function EquipementTable() {
   }
 
   return (
-    <Card>
-      <SoftBox p={3}>
+      <SoftBox>
         <SoftTypography variant="h6" fontWeight="bold" mb={2}>
           {`Table des Équipements`}
         </SoftTypography>
@@ -287,7 +286,6 @@ function EquipementTable() {
           </tbody>
         </table>
       </SoftBox>
-    </Card>
   );
 }
 

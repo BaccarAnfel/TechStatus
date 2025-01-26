@@ -84,8 +84,7 @@ function EquipementArchive() {
   }
 
   return (
-    <Card>
-      <SoftBox p={3}>
+      <SoftBox>
         <SoftTypography variant="h6" fontWeight="bold" mb={2}>
           Table des Équipements Archivés
         </SoftTypography>
@@ -276,7 +275,6 @@ function EquipementArchive() {
           </tbody>
         </table>
       </SoftBox>
-    </Card>
   );
 }
 

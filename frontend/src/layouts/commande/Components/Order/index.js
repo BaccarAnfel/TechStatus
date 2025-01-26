@@ -135,7 +135,7 @@ function Ordre({ onCancel, onSuccess }) {
       <SoftBox mb={3} display="flex" justifyContent="space-around" alignItems="stretch">
         <SoftBox>
           <SoftButton
-            sx={{ width: (theme) => theme.spacing(69) }}
+            sx={{ width: (theme) => theme.spacing(70) }}
             variant="gradient"
             color="secondary"
             fullWidth
@@ -146,7 +146,7 @@ function Ordre({ onCancel, onSuccess }) {
         </SoftBox>
         <SoftBox>
           <SoftButton
-            sx={{ width: (theme) => theme.spacing(69) }}
+            sx={{ width: (theme) => theme.spacing(70) }}
             variant="gradient"
             color="secondary"
             fullWidth
