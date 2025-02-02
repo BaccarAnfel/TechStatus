@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
-import PropTypes from "prop-types"; // Import prop-types
+import PropTypes from "prop-types";
 import { Modal, Box, Typography, CircularProgress } from "@mui/material";
 
 const OrderDetailsModal = ({ open, onClose, command_id }) => {
   const [order, setOrder] = useState(null);
+  const [equipements, setEquipements] = useState([]); // État pour stocker les équipements groupés
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -13,7 +14,7 @@ const OrderDetailsModal = ({ open, onClose, command_id }) => {
       setLoading(true);
       setError(null);
 
-      // Fetch order details and associated equipment
+      // Fetch order details
       fetch(`http://localhost:5000/api/commandes/${command_id}`)
         .then((response) => {
           if (!response.ok) {
@@ -22,11 +23,27 @@ const OrderDetailsModal = ({ open, onClose, command_id }) => {
           return response.json();
         })
         .then((data) => {
-          setOrder(data); // Set the order details and associated equipment
-          setLoading(false);
+          setOrder(data); // Set the order details
         })
         .catch((error) => {
           console.error("Error fetching order details:", error);
+          setError(error.message);
+        });
+
+      // Fetch grouped equipment for the command
+      fetch(`http://localhost:5000/api/equipementsCommand/${command_id}`)
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Failed to fetch equipment details");
+          }
+          return response.json();
+        })
+        .then((data) => {
+          setEquipements(data); // Set the grouped equipment
+          setLoading(false);
+        })
+        .catch((error) => {
+          console.error("Error fetching equipment details:", error);
           setError(error.message);
           setLoading(false);
         });
@@ -60,7 +77,7 @@ const OrderDetailsModal = ({ open, onClose, command_id }) => {
             <Typography>Statut: {order.status_cmd}</Typography>
             <Typography>Équipements:</Typography>
             <ul>
-              {order.equipements.map((equipement, index) => (
+              {equipements.map((equipement, index) => (
                 <li key={index}>
                   {equipement.nom_Equipement} - Quantité: {equipement.quantity}
                 </li>

@@ -249,6 +249,7 @@ function CommandeTable() {
                   <IconButton
                     color="primary"
                     onClick={() => navigate(`/edit-commande/${commande.command_id}`)}
+                    disabled={commande.status_cmd == "Terminée"}
                   >
                     <EditIcon />
                   </IconButton>

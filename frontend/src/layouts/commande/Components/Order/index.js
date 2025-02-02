@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Card from "@mui/material/Card";
 import SoftBox from "components/SoftBox";
 import SoftTypography from "components/SoftTypography";
@@ -6,19 +6,34 @@ import SoftButton from "components/SoftButton";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
-import Autocomplete from "@mui/material/Autocomplete";
 import TextField from "@mui/material/TextField";
 import PropTypes from "prop-types";
 
 function Ordre({ onCancel, onSuccess }) {
-  const [articles, setArticles] = useState([{ nom_Equipement: "", quantity: "", status_equipement: "Disponible" }]);
+  const [articles, setArticles] = useState([{ nom_Equipement: "", quantity: 1, status_equipement: "Disponible" }]);
   const [status_cmd, setStatusCmd] = useState("En cours");
+  const [equipements, setEquipements] = useState([]); // État pour stocker les équipements
 
-  // Liste statique des équipements prédéfinis
-  const equipementsPredefinis = ["Vidéo projecteur", "Imprimante", "Ordinateur portable", "Tableau blanc"];
+  // Récupérer les équipements depuis la base de données
+  useEffect(() => {
+    const fetchEquipements = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/api/equipementsByName");
+        if (!response.ok) {
+          throw new Error("Erreur lors de la récupération des équipements");
+        }
+        const data = await response.json();
+        setEquipements(data); // Mettre à jour l'état avec les équipements récupérés
+      } catch (error) {
+        console.error("Erreur:", error);
+      }
+    };
+
+    fetchEquipements();
+  }, []);
 
   const handleAddArticle = () => {
-    setArticles([...articles, { nom_Equipement: "", quantity: "", status_equipement: "Disponible" }]);
+    setArticles([...articles, { nom_Equipement: "", quantity: 1, status_equipement: "Disponible" }]);
   };
 
   const handleEquipementChange = (index, value) => {
@@ -65,7 +80,7 @@ function Ordre({ onCancel, onSuccess }) {
       const commandId = commandeData.command_id;
 
       console.log("Commande et équipements créés avec succès !");
-      setArticles([{ nom_Equipement: "", quantity: "", status_equipement: "Disponible" }]);
+      setArticles([{ nom_Equipement: "", quantity: 1, status_equipement: "Disponible" }]);
       setStatusCmd("En cours");
       alert("Commande enregistrée avec succès !");
       onSuccess();
@@ -98,19 +113,21 @@ function Ordre({ onCancel, onSuccess }) {
         <SoftBox key={index} display="flex" justifyContent="space-between" ml={3} mr={3} mt={2} mb={2}>
           <SoftBox flex={1} mr={2}>
             <FormControl fullWidth>
-              <Autocomplete
-                freeSolo
-                options={equipementsPredefinis}
+              <Select
                 value={article.nom_Equipement}
-                onChange={(event, newValue) => handleEquipementChange(index, newValue)}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    placeholder="Nom de l'équipement"
-                    onChange={(e) => handleEquipementChange(index, e.target.value)}
-                  />
-                )}
-              />
+                onChange={(e) => handleEquipementChange(index, e.target.value)}
+                displayEmpty
+                inputProps={{ "aria-label": "Nom de l'équipement" }}
+              >
+                <MenuItem value="" disabled>
+                  Sélectionnez un équipement
+                </MenuItem>
+                {equipements.map((equipement, i) => (
+                  <MenuItem key={i} value={equipement}>
+                    {equipement}
+                  </MenuItem>
+                ))}
+              </Select>
             </FormControl>
           </SoftBox>
 
@@ -121,6 +138,7 @@ function Ordre({ onCancel, onSuccess }) {
               value={article.quantity}
               onChange={(e) => handleQuantityChange(index, e.target.value)}
               fullWidth
+              inputProps={{ min: 1 }} // Quantité minimale de 1
             />
           </SoftBox>
         </SoftBox>

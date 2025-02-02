@@ -13,37 +13,37 @@ function EditSalle() {
   const navigate = useNavigate();
   const [salle, setSalle] = useState({
     nom_Salle: "",
-    local_id: "", // Ajouter local_id à l'état de la salle
+    local_id: "",
   });
-  const [locaux, setLocaux] = useState([]); // État pour stocker la liste des locaux
+  const [locaux, setLocaux] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   // Récupérer les données de la salle et la liste des locaux
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Récupérer les détails de la salle et les informations du local associé
-        const salleResponse = await fetch(`http://localhost:5000/api/salles/${salle_id}`);
-        const salleData = await salleResponse.json();
-
-        // Vérifier si les données sont valides
-        if (!salleData || !salleData.local_id) {
-          console.error("Données de la salle ou local_id non trouvées");
-          setLoading(false);
-          return;
+        // Récupérer les détails de la salle
+        const salleResponse = await fetch(`http://localhost:5000/api/salleGet/${salle_id}`);
+        if (!salleResponse.ok) {
+          throw new Error("Erreur lors de la récupération des données de la salle");
         }
-
-        // Mettre à jour l'état de la salle avec les données récupérées
-        setSalle(salleData);
-
+        const salleData = await salleResponse.json();
+        console.log(salleData);
         // Récupérer la liste des locaux
         const locauxResponse = await fetch("http://localhost:5000/api/locaux");
+        if (!locauxResponse.ok) {
+          throw new Error("Erreur lors de la récupération des locaux");
+        }
         const locauxData = await locauxResponse.json();
-        setLocaux(locauxData); // Mettre à jour l'état des locaux
 
+        // Mettre à jour les états
+        setSalle(salleData);
+        setLocaux(locauxData);
         setLoading(false);
       } catch (error) {
         console.error("Erreur lors de la récupération des données :", error);
+        setError(error.message);
         setLoading(false);
       }
     };
@@ -63,23 +63,29 @@ function EditSalle() {
   // Soumettre le formulaire pour mettre à jour la salle
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!salle.nom_Salle || !salle.local_id) {
+      alert("Veuillez remplir tous les champs");
+      return;
+    }
+
     try {
       const response = await fetch(`http://localhost:5000/api/salles/${salle_id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(salle), // Envoyer les données mises à jour
+        body: JSON.stringify(salle),
       });
 
       if (response.ok) {
         alert("Salle mise à jour avec succès !");
-        navigate("/salles"); // Rediriger vers la table des salles
+        navigate("/salles");
       } else {
-        console.error("Erreur lors de la mise à jour de la salle");
+        throw new Error("Erreur lors de la mise à jour de la salle");
       }
     } catch (error) {
       console.error("Erreur lors de la mise à jour de la salle :", error);
+      alert("Erreur lors de la mise à jour de la salle");
     }
   };
 
@@ -87,6 +93,16 @@ function EditSalle() {
     return (
       <SoftBox py={3}>
         <SoftTypography variant="h6">Chargement...</SoftTypography>
+      </SoftBox>
+    );
+  }
+
+  if (error) {
+    return (
+      <SoftBox py={3}>
+        <SoftTypography variant="h6" color="error">
+          {error}
+        </SoftTypography>
       </SoftBox>
     );
   }
@@ -111,7 +127,7 @@ function EditSalle() {
                 type="text"
                 placeholder="Nom de la salle"
                 name="nom_Salle"
-                value={salle.nom_Salle} // Pré-remplir le champ avec la valeur récupérée
+                value={salle.nom_Salle}
                 onChange={handleInputChange}
                 fullWidth
               />
@@ -122,7 +138,7 @@ function EditSalle() {
               </SoftTypography>
               <select
                 name="local_id"
-                value={salle.local_id || ""} // Utiliser la valeur de salle.local_id ou une chaîne vide par défaut
+                value={salle.local_id || ""}
                 onChange={handleInputChange}
                 style={{
                   width: "100%",
@@ -135,8 +151,7 @@ function EditSalle() {
               >
                 <option value="" disabled>
                   Sélectionner un local
-                </option>{" "}
-                {/* Option désactivée par défaut */}
+                </option>
                 {locaux.map((local) => (
                   <option key={local.local_id} value={local.local_id}>
                     {local.nom_Local}
@@ -150,7 +165,7 @@ function EditSalle() {
               variant="gradient"
               color="error"
               sx={{ width: "47%" }}
-              onClick={() => navigate("/salles")} // Annuler et revenir à la table des salles
+              onClick={() => navigate("/salles")}
             >
               Annuler
             </SoftButton>

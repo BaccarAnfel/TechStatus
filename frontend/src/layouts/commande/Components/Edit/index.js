@@ -13,15 +13,13 @@ import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 function EditCommande() {
   const { commandId } = useParams();
   const navigate = useNavigate();
-  const [articles, setArticles] = useState([]);
+  const [articles, setArticles] = useState([]); // Liste des articles groupés
   const [statusCmd, setStatusCmd] = useState("En cours"); // Statut de la commande
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [equipements, setEquipements] = useState([]); // Liste des équipements récupérés depuis l'API
 
-  // Liste statique des équipements prédéfinis
-  const equipementsPredefinis = ["Vidéo projecteur", "Imprimante", "Ordinateur portable", "Tableau blanc"];
-
-  // Récupérer les détails de la commande depuis l'API
+  // Récupérer les détails de la commande et les équipements depuis l'API
   useEffect(() => {
     const fetchCommande = async () => {
       try {
@@ -35,15 +33,18 @@ function EditCommande() {
         // Récupérer le statut de la commande
         setStatusCmd(data.status_cmd);
 
-        // Correction de la méthode articlesAvecEquipementsValides
-        const articlesAvecEquipementsValides = data.equipements
-          .filter((equipement) => equipement.nom_Equipement) // Ignorer les équipements sans nom
-          .map((equipement) => ({
-            nom_Equipement: equipementsPredefinis.includes(equipement.nom_Equipement.trim())
-              ? equipement.nom_Equipement.trim() // Utiliser le nom tel quel s'il est valide
-              : "", // Remplacer par une chaîne vide pour les équipements non reconnus
-            quantity: equipement.quantity,
-          }));
+        // Récupérer les équipements groupés
+        const equipementsResponse = await fetch(`http://localhost:5000/api/equipementsCommand/${commandId}`);
+        if (!equipementsResponse.ok) {
+          throw new Error("Erreur lors de la récupération des équipements");
+        }
+        const equipements = await equipementsResponse.json();
+
+        // Mapper les équipements groupés pour les afficher
+        const articlesAvecEquipementsValides = equipements.map((equipement) => ({
+          nom_Equipement: equipement.nom_Equipement,
+          quantity: equipement.quantity,
+        }));
 
         console.log("Articles avec équipements valides:", articlesAvecEquipementsValides);
         setArticles(articlesAvecEquipementsValides);
@@ -55,7 +56,21 @@ function EditCommande() {
       }
     };
 
+    const fetchEquipements = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/api/equipementsByName");
+        if (!response.ok) {
+          throw new Error("Erreur lors de la récupération des équipements");
+        }
+        const data = await response.json();
+        setEquipements(data);
+      } catch (error) {
+        console.error("Erreur lors de la récupération des équipements:", error);
+      }
+    };
+
     fetchCommande();
+    fetchEquipements();
   }, [commandId]);
 
   // Gérer le changement d'équipement
@@ -68,7 +83,7 @@ function EditCommande() {
   // Gérer le changement de quantité
   const handleQuantityChange = (index, value) => {
     const newArticles = [...articles];
-    newArticles[index].quantity = value;
+    newArticles[index].quantity = parseInt(value, 10) || 0; // Convertir en nombre
     setArticles(newArticles);
   };
 
@@ -172,7 +187,7 @@ function EditCommande() {
                 <MenuItem value="" disabled>
                   Sélectionner un équipement
                 </MenuItem>
-                {equipementsPredefinis.map((equipement, i) => (
+                {equipements.map((equipement, i) => (
                   <MenuItem key={i} value={equipement}>
                     {equipement}
                   </MenuItem>

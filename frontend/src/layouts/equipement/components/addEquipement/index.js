@@ -22,15 +22,25 @@ function AddEquipement({ onCancel, onEquipementAdded }) {
   const [salles, setSalles] = useState([]);
   const [loadingLocaux, setLoadingLocaux] = useState(true);
   const [loadingSalles, setLoadingSalles] = useState(false);
+  const [equipements, setEquipements] = useState([]); // Liste des équipements récupérés depuis l'API
 
-  // Liste statique des équipements prédéfinis
-  const equipementsPredefinis = [
-    "Vidéo projecteur",
-    "Imprimante",
-    "Ordinateur portable",
-    "Tableau blanc",
-    "Écran interactif",
-  ];
+  // Récupérer la liste des équipements depuis l'API
+  useEffect(() => {
+    const fetchEquipements = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/api/equipementsByName");
+        if (!response.ok) {
+          throw new Error("Erreur lors de la récupération des équipements");
+        }
+        const data = await response.json();
+        setEquipements(data);
+      } catch (error) {
+        console.error("Erreur lors de la récupération des équipements:", error);
+      }
+    };
+
+    fetchEquipements();
+  }, []);
 
   // Récupérer la liste des locaux depuis l'API
   useEffect(() => {
@@ -121,29 +131,30 @@ function AddEquipement({ onCancel, onEquipementAdded }) {
     }
 
     try {
-      const response = await fetch("http://localhost:5000/api/addEquipement", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(equipement),
-      });
+      // Vérifier si l'équipement existe déjà dans la base de données
+      const equipementExists = equipements.includes(equipement.nom_equipement);
 
-      if (response.ok) {
-        console.log("Équipement ajouté avec succès !");
-        alert("Équipement ajouté avec succès !");
-        setEquipement({
-          nom_equipement: "",
-          status: "",
-          local_id: "",
-          salle_id: "",
+        // Si l'équipement n'existe pas, l'ajouter à la base de données
+        const response = await fetch("http://localhost:5000/api/addEquipement", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(equipement),
         });
-        if (onCancel) onCancel();
-        if (onEquipementAdded) onEquipementAdded();
-      } else {
-        console.error("Erreur lors de l'ajout de l'équipement");
-        alert("Erreur lors de l'ajout de l'équipement");
-      }
+
+        if (response.ok) {
+          console.log("Équipement ajouté avec succès !");
+          alert("Équipement ajouté avec succès !");
+          setEquipement({
+            nom_equipement: "",
+            status: "",
+            local_id: "",
+            salle_id: "",
+          });
+          if (onCancel) onCancel();
+          if (onEquipementAdded) onEquipementAdded();
+        }
     } catch (error) {
       console.error("Erreur lors de l'envoi de la requête:", error);
       alert("Erreur lors de l'envoi de la requête");
@@ -173,19 +184,28 @@ function AddEquipement({ onCancel, onEquipementAdded }) {
         </SoftBox>
         <SoftBox flexWrap="wrap" display="flex" justifyContent="space-between" ml={3}>
           <SoftBox flex={1} mr={3}>
-            <Autocomplete
-              freeSolo
-              options={equipementsPredefinis}
-              value={equipement.nom_equipement}
-              onChange={handleEquipementChange}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  placeholder="Nom de l'équipement"
-                  fullWidth
-                />
-              )}
-            />
+          <Autocomplete
+  freeSolo
+  options={equipements}
+  value={equipement.nom_equipement}
+  getOptionLabel={(option) => option.nom || option} // Assure-toi que chaque option a une valeur lisible
+  renderOption={(props, option) => (
+    <li {...props} key={option.id || option}> {/* Ajoute la clé ici */}
+      {option.nom || option}
+    </li>
+  )}
+  onChange={handleEquipementChange}
+  onInputChange={(event, newValue) => {
+    setEquipement((prevState) => ({
+      ...prevState,
+      nom_equipement: newValue || "",
+    }));
+  }}
+  renderInput={(params) => (
+    <TextField {...params} placeholder="Nom de l'équipement" fullWidth />
+  )}
+/>
+
           </SoftBox>
           <SoftBox flex={1} mr={3}>
             <Select

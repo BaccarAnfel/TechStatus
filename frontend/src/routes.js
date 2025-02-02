@@ -23,6 +23,7 @@ import SignIn from "layouts/authentication/sign-in";
 import SignUp from "layouts/authentication/sign-up";
 import ArchiveIcon from "@mui/icons-material/Archive";
 import Archive from "layouts/archive";
+import EquipementDetails from "layouts/equipement/components/equipementTable/components/EquipementDetails";
 
 const routes = [
   {
@@ -78,7 +79,7 @@ const routes = [
     icon: <ArchiveIcon size="12px" />,
     component: <Archive />,
     noCollapse: true,
-  },
+  },/*
   {
     type: "collapse",
     name: "Profile",
@@ -87,7 +88,7 @@ const routes = [
     icon: <CustomerSupport size="12px" />,
     component: <Profile />,
     noCollapse: true,
-  },
+  },*/
   {
     type: "route",
     name: "Edit Commande",
@@ -116,8 +117,8 @@ const routes = [
     type: "route",
     name: "Edit Salle",
     key: "edit-salle",
-    route: "/edit-salle/:salle_id", // Route dynamique avec l'ID de la commande
-    component: <EditSalle />, // Composant pour éditer la commande
+    route: "/edit-salle/:salle_id", 
+    component: <EditSalle />, 
     noCollapse: true,
   },
   {
@@ -126,6 +127,14 @@ const routes = [
     key: "imprimer commande",
     route: "/commandes/:commandId/print", // Route dynamique avec l'ID de la commande
     component: <PrintCommande />, // Composant pour éditer la commande
+    noCollapse: true,
+  },
+  {
+    type: "route",
+    name: "Equipement Detail",
+    key: "equipement detail",
+    route: "/equipement-details/:equipementName", 
+    component: <EquipementDetails />, 
     noCollapse: true,
   },
 

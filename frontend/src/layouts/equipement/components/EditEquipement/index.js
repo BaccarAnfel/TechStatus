@@ -9,8 +9,6 @@ import Card from "@mui/material/Card";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 
-const equipementsPredefinis = ["Vidéo projecteur", "Imprimante", "Ordinateur portable", "Tableau blanc"];
-
 function EditEquipement() {
   const { equipement_id } = useParams();
   const navigate = useNavigate();
@@ -24,6 +22,22 @@ function EditEquipement() {
   const [salles, setSalles] = useState([]);
   const [locaux, setLocaux] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [equipementsList, setEquipementsList] = useState([]); // État pour stocker la liste des équipements
+
+  // Récupérer la liste des équipements
+  useEffect(() => {
+    const fetchEquipementsList = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/api/equipementsByName");
+        const data = await response.json();
+        setEquipementsList(data); // Mettre à jour l'état avec la liste des équipements
+      } catch (error) {
+        console.error("Erreur lors de la récupération de la liste des équipements :", error);
+      }
+    };
+
+    fetchEquipementsList();
+  }, []);
 
   // Fetch equipment data
   useEffect(() => {
@@ -160,7 +174,7 @@ function EditEquipement() {
               </SoftTypography>
               <Select
                 name="nom_Equipement"
-                value={equipement.nom_Equipement}
+                value={equipement.nom_Equipement || ""}
                 onChange={handleInputChange}
                 displayEmpty
                 fullWidth
@@ -168,7 +182,7 @@ function EditEquipement() {
                 <MenuItem value="" disabled>
                   Sélectionner un équipement
                 </MenuItem>
-                {equipementsPredefinis.map((equipement) => (
+                {equipementsList.map((equipement) => (
                   <MenuItem key={equipement} value={equipement}>
                     {equipement}
                   </MenuItem>
