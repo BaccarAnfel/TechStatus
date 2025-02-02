@@ -39,7 +39,7 @@ function reducer(state, action) {
 }
 
 // Soft UI Dashboard React context provider
-function SoftUIControllerProvider({ children }) {
+function ControllerProvider({ children }) {
   const initialState = {
     miniSidenav: false,
     transparentSidenav: true,
@@ -58,18 +58,18 @@ function SoftUIControllerProvider({ children }) {
 }
 
 // Soft UI Dashboard React custom hook for using context
-function useSoftUIController() {
+function useController() {
   const context = useContext(SoftUI);
 
   if (!context) {
-    throw new Error("useSoftUIController should be used inside the SoftUIControllerProvider.");
+    throw new Error("useController should be used inside the ControllerProvider.");
   }
 
   return context;
 }
 
-// Typechecking props for the SoftUIControllerProvider
-SoftUIControllerProvider.propTypes = {
+// Typechecking props for the ControllerProvider
+ControllerProvider.propTypes = {
   children: PropTypes.node.isRequired,
 };
 
@@ -83,8 +83,8 @@ const setDirection = (dispatch, value) => dispatch({ type: "DIRECTION", value })
 const setLayout = (dispatch, value) => dispatch({ type: "LAYOUT", value });
 
 export {
-  SoftUIControllerProvider,
-  useSoftUIController,
+  ControllerProvider,
+  useController,
   setMiniSidenav,
   setTransparentSidenav,
   setSidenavColor,

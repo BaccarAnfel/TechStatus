@@ -1039,21 +1039,54 @@ app.get("/api/salles/:local_id", (req, res) => {
 });
 
 //////////////////////////////////////////////////////////
-// delete salle par id ajouté par Siriiiin
+// delete salle 
 //////////////////////////////////////////////////////////
 app.delete("/api/salles/:salle_id", (req, res) => {
   const { salle_id } = req.params;
 
-  const query = "DELETE FROM salle WHERE salle_id = ?";
-  db.query(query, [salle_id], (err, results) => {
+  db.beginTransaction((err) => {
     if (err) {
-      console.error("Erreur lors de la suppression de la salle:", err);
-      res.status(500).json({ error: "Erreur de la base de données" });
-    } else if (results.affectedRows === 0) {
-      res.status(404).json({ error: "Salle non trouvée" });
-    } else {
-      res.json({ message: "Salle supprimée avec succès" });
+      console.error("Erreur lors du début de la transaction:", err);
+      return res.status(500).json({ error: "Erreur de la base de données" });
     }
+    const updateEquipementQuery = "UPDATE equipement SET status_equipement = 'Disponible' WHERE salle_id = ?";
+    db.query(updateEquipementQuery, [salle_id], (err, results) => {
+      if (err) {
+        return db.rollback(() => {
+          console.error("Erreur lors de la mise à jour des équipements:", err);
+          res.status(500).json({ error: "Erreur de la base de données" });
+        });
+      }
+    const deleteSalleQuery = "DELETE FROM salle WHERE salle_id = ?";
+    db.query(deleteSalleQuery, [salle_id], (err, results) => {
+      if (err) {
+        return db.rollback(() => {
+          console.error("Erreur lors de la suppression de la salle:", err);
+          res.status(500).json({ error: "Erreur de la base de données" });
+        });
+      }
+
+      if (results.affectedRows === 0) {
+        return db.rollback(() => {
+          res.status(404).json({ error: "Salle non trouvée" });
+        });
+      }
+        // Commit de la transaction
+        db.commit((err) => {
+          if (err) {
+            return db.rollback(() => {
+              console.error("Erreur lors du commit de la transaction:", err);
+              res.status(500).json({ error: "Erreur de la base de données" });
+            });
+          }
+
+          res.json({
+            message: "Salle supprimée avec succès et équipements mis à jour",
+            equipementsUpdated: results.affectedRows,
+          });
+        });
+      });
+    });
   });
 });
 

@@ -25,11 +25,11 @@ import SidenavRoot from "examples/Sidenav/SidenavRoot";
 import sidenavLogoLabel from "examples/Sidenav/styles/sidenav";
 
 // Soft UI Dashboard React context
-import { useSoftUIController, setMiniSidenav } from "context";
+import { useController, setMiniSidenav } from "context";
 import { Gradient } from "@mui/icons-material";
 
-function Sidenav({ color, brand, brandName, routes, ...rest }) {
-  const [controller, dispatch] = useSoftUIController();
+function Sidenav({ color = "info", brand = "", brandName, routes, ...rest }) {
+  const [controller, dispatch] = useController();
   const { miniSidenav, transparentSidenav } = controller;
   const location = useLocation();
   const { pathname } = location;
@@ -134,7 +134,7 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
             width={!brandName && "100%"}
             sx={(theme) => sidenavLogoLabel(theme, { miniSidenav })}
           >
-            <SoftTypography color="black" component="h6" variant="button" fontWeight="bold">
+            <SoftTypography sx={{ color: 'black' }} component="h6" variant="button" fontWeight="bold">
               {brandName}
             </SoftTypography>
           </SoftBox>
@@ -146,11 +146,6 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
   );
 }
 
-// Setting default values for the props of Sidenav
-Sidenav.defaultProps = {
-  color: "info",
-  brand: "",
-};
 
 // Typechecking props for the Sidenav
 Sidenav.propTypes = {

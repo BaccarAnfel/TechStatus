@@ -19,10 +19,10 @@ import {
 } from "examples/Sidenav/styles/sidenavCollapse";
 
 // Soft UI Dashboard React context
-import { useSoftUIController } from "context";
+import { useController } from "context";
 
-function SidenavCollapse({ color, icon, name, children, active, noCollapse, open, ...rest }) {
-  const [controller] = useSoftUIController();
+function SidenavCollapse({ color, icon, name, children = false, active = false, noCollapse = false, open = false, ...rest }) {
+  const [controller] = useController();
   const { miniSidenav, transparentSidenav } = controller;
 
   return (
@@ -54,14 +54,6 @@ function SidenavCollapse({ color, icon, name, children, active, noCollapse, open
   );
 }
 
-// Setting default values for the props of SidenavCollapse
-SidenavCollapse.defaultProps = {
-  color: "info",
-  active: false,
-  noCollapse: false,
-  children: false,
-  open: false,
-};
 
 // Typechecking props for the SidenavCollapse
 SidenavCollapse.propTypes = {

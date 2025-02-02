@@ -10,10 +10,10 @@ import PropTypes from "prop-types";
 import SoftBox from "components/SoftBox";
 
 // Soft UI Dashboard React context
-import { useSoftUIController, setLayout } from "context";
+import { useController, setLayout } from "context";
 
 function DashboardLayout({ children }) {
-  const [controller, dispatch] = useSoftUIController();
+  const [controller, dispatch] = useController();
   const { miniSidenav } = controller;
   const { pathname } = useLocation();
 

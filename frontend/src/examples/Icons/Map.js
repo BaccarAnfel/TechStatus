@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 // Soft UI Dashboard React base styles
 import colors from "assets/theme/base/colors";
 
-function Map({ color, size }) {
+function Map({ color = "dark", size = "16px" }) {
   return (
     <svg
       width={size}
@@ -36,12 +36,6 @@ function Map({ color, size }) {
     </svg>
   );
 }
-
-// Setting default values for the props of Map
-Map.defaultProps = {
-  color: "dark",
-  size: "16px",
-};
 
 // Typechecking props for the Map
 Map.propTypes = {

@@ -28,13 +28,13 @@ import createCache from "@emotion/cache";
 import routes from "routes";
 
 // Soft UI Dashboard React contexts
-import { useSoftUIController, setMiniSidenav } from "context";
+import { useController, setMiniSidenav } from "context";
 
 // Images
 import brand from "assets/images/logo-ct.png";
 
 export default function App() {
-  const [controller, dispatch] = useSoftUIController();
+  const [controller, dispatch] = useController();
   const { miniSidenav, direction, layout, sidenavColor } = controller;
   const [onMouseEnter, setOnMouseEnter] = useState(false);
   const [rtlCache, setRtlCache] = useState(null);
