@@ -9,7 +9,6 @@ import SoftInputWithIconRoot from "components/SoftInput/SoftInputWithIconRoot";
 import SoftInputIconBoxRoot from "components/SoftInput/SoftInputIconBoxRoot";
 import SoftInputIconRoot from "components/SoftInput/SoftInputIconRoot";
 
-// Soft UI Dashboard React contexts
 import { useController } from "context";
 
 const SoftInput = forwardRef(({ size, icon, error, success, disabled, ...rest }, ref) => {

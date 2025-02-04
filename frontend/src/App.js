@@ -9,13 +9,10 @@ import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import Icon from "@mui/material/Icon";
 
-// Soft UI Dashboard React components
 import SoftBox from "components/SoftBox";
 
-// Soft UI Dashboard React examples
 import Sidenav from "examples/Sidenav";
 
-// Soft UI Dashboard React themes
 import theme from "assets/theme";
 import themeRTL from "assets/theme/theme-rtl";
 
@@ -24,10 +21,8 @@ import rtlPlugin from "stylis-plugin-rtl";
 import { CacheProvider } from "@emotion/react";
 import createCache from "@emotion/cache";
 
-// Soft UI Dashboard React routes
 import routes from "routes";
 
-// Soft UI Dashboard React contexts
 import { useController, setMiniSidenav } from "context";
 
 // Images
