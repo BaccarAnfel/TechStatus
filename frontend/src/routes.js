@@ -1,5 +1,4 @@
 import Dashboard from "layouts/dashboard";
-import Profile from "layouts/profile";
 import Commande from "layouts/commande";
 import Equipement from "layouts/equipement";
 import Locaux from "layouts/locaux";
@@ -8,19 +7,13 @@ import EditCommande from "layouts/commande/Components/Edit";
 
 import Shop from "examples/Icons/Shop";
 import Settings from "examples/Icons/Settings";
-import Document from "examples/Icons/Document";
-import SpaceShip from "examples/Icons/SpaceShip";
-import CustomerSupport from "examples/Icons/CustomerSupport";
 import Basket from "examples/Icons/Basket";
-import Cube from "examples/Icons/Cube";
 import Map from "examples/Icons/Map";
 import Office from "examples/Icons/Office";
 import EditEquipement from "layouts/equipement/components/EditEquipement";
 import EditLocaux from "layouts/locaux/components/editLocaux";
 import EditSalle from "layouts/salle/components/editSalle";
 import PrintCommande from "layouts/commande/Components/Imprimer";
-import SignIn from "layouts/authentication/sign-in";
-import SignUp from "layouts/authentication/sign-up";
 import ArchiveIcon from "@mui/icons-material/Archive";
 import Archive from "layouts/archive";
 import EquipementDetails from "layouts/equipement/components/equipementTable/components/EquipementDetails";
@@ -79,16 +72,7 @@ const routes = [
     icon: <ArchiveIcon size="12px" />,
     component: <Archive />,
     noCollapse: true,
-  },/*
-  {
-    type: "collapse",
-    name: "Profile",
-    key: "profile",
-    route: "/profile",
-    icon: <CustomerSupport size="12px" />,
-    component: <Profile />,
-    noCollapse: true,
-  },*/
+  },
   {
     type: "route",
     name: "Edit Commande",
@@ -101,16 +85,16 @@ const routes = [
     type: "route",
     name: "Edit Equipement",
     key: "edit-equipement",
-    route: "/edit-equipement/:equipement_id", // Route dynamique avec l'ID de la commande
-    component: <EditEquipement />, // Composant pour éditer la commande
+    route: "/edit-equipement/:equipement_id", 
+    component: <EditEquipement />, 
     noCollapse: true,
   },
   {
     type: "route",
     name: "Edit Locaux",
     key: "edit-locaux",
-    route: "/edit-locaux/:local_id", // Route dynamique avec l'ID de la commande
-    component: <EditLocaux />, // Composant pour éditer la commande
+    route: "/edit-locaux/:local_id", 
+    component: <EditLocaux />, 
     noCollapse: true,
   },
   {

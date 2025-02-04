@@ -8,7 +8,6 @@ const SoftUI = createContext(null);
 // Setting custom name for the context which is visible on react dev tools
 SoftUI.displayName = "SoftUIContext";
 
-// Soft UI Dashboard React reducer
 function reducer(state, action) {
   switch (action.type) {
     case "MINI_SIDENAV": {
@@ -38,7 +37,6 @@ function reducer(state, action) {
   }
 }
 
-// Soft UI Dashboard React context provider
 function ControllerProvider({ children }) {
   const initialState = {
     miniSidenav: false,
@@ -57,7 +55,6 @@ function ControllerProvider({ children }) {
   return <SoftUI.Provider value={value}>{children}</SoftUI.Provider>;
 }
 
-// Soft UI Dashboard React custom hook for using context
 function useController() {
   const context = useContext(SoftUI);
 
