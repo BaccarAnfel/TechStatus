@@ -10,11 +10,13 @@ import Settings from "examples/Icons/Settings";
 import Basket from "examples/Icons/Basket";
 import Map from "examples/Icons/Map";
 import Office from "examples/Icons/Office";
+import Store from "examples/Icons/Store";
+
 import EditEquipement from "layouts/equipement/components/EditEquipement";
 import EditLocaux from "layouts/locaux/components/editLocaux";
 import EditSalle from "layouts/salle/components/editSalle";
 import PrintCommande from "layouts/commande/Components/Imprimer";
-import ArchiveIcon from "@mui/icons-material/Archive";
+
 import Archive from "layouts/archive";
 import EquipementDetails from "layouts/equipement/components/equipementTable/components/EquipementDetails";
 
@@ -69,7 +71,7 @@ const routes = [
     name: "archive",
     key: "archive",
     route: "/archive",
-    icon: <ArchiveIcon size="12px" />,
+    icon: <Store size="12px" />,
     component: <Archive />,
     noCollapse: true,
   },
