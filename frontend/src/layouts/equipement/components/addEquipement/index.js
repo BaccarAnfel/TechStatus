@@ -16,40 +16,34 @@ function AddEquipement({ onCancel, onEquipementAdded }) {
     status: "",
     local_id: "",
     salle_id: "",
+    image_url: "", // Ajout du champ image_url
   });
 
   const [locaux, setLocaux] = useState([]);
   const [salles, setSalles] = useState([]);
   const [loadingLocaux, setLoadingLocaux] = useState(true);
   const [loadingSalles, setLoadingSalles] = useState(false);
-  const [equipements, setEquipements] = useState([]); // Liste des équipements récupérés depuis l'API
+  const [equipements, setEquipements] = useState([]);
 
-  // Récupérer la liste des équipements depuis l'API
   useEffect(() => {
     const fetchEquipements = async () => {
       try {
         const response = await fetch("http://localhost:5000/api/equipementsByName");
-        if (!response.ok) {
-          throw new Error("Erreur lors de la récupération des équipements");
-        }
+        if (!response.ok) throw new Error("Erreur lors de la récupération des équipements");
         const data = await response.json();
         setEquipements(data);
       } catch (error) {
         console.error("Erreur lors de la récupération des équipements:", error);
       }
     };
-
     fetchEquipements();
   }, []);
 
-  // Récupérer la liste des locaux depuis l'API
   useEffect(() => {
     const fetchLocaux = async () => {
       try {
         const response = await fetch("http://localhost:5000/api/locaux");
-        if (!response.ok) {
-          throw new Error("Erreur lors de la récupération des locaux");
-        }
+        if (!response.ok) throw new Error("Erreur lors de la récupération des locaux");
         const data = await response.json();
         setLocaux(data);
         setLoadingLocaux(false);
@@ -58,18 +52,14 @@ function AddEquipement({ onCancel, onEquipementAdded }) {
         setLoadingLocaux(false);
       }
     };
-
     fetchLocaux();
   }, []);
 
-  // Récupérer la liste des salles en fonction du local sélectionné
   const fetchSallesByLocal = async (local_id) => {
     setLoadingSalles(true);
     try {
       const response = await fetch(`http://localhost:5000/api/salles/${local_id}`);
-      if (!response.ok) {
-        throw new Error("Erreur lors de la récupération des salles");
-      }
+      if (!response.ok) throw new Error("Erreur lors de la récupération des salles");
       const data = await response.json();
       setSalles(data);
       setLoadingSalles(false);
@@ -86,75 +76,49 @@ function AddEquipement({ onCancel, onEquipementAdded }) {
       [name]: value,
     }));
 
-    // Si le local est sélectionné, récupérer les salles correspondantes
     if (name === "local_id") {
-      setSalles([]); // Réinitialiser la liste des salles
-      setEquipement((prevState) => ({
-        ...prevState,
-        salle_id: "", // Réinitialiser salle_id
-      }));
+      setSalles([]);
+      setEquipement((prevState) => ({ ...prevState, salle_id: "" }));
       fetchSallesByLocal(value);
     }
 
-    // Si le statut change, réinitialiser local_id et salle_id si nécessaire
-    if (name === "status" && (value === "Non Exploitable" || value === "En Maintenance" || value === "Disponible")) {
-      setEquipement((prevState) => ({
-        ...prevState,
-        local_id: "", // Réinitialiser local_id
-        salle_id: "", // Réinitialiser salle_id
-      }));
-      setSalles([]); // Réinitialiser la liste des salles
+    if (name === "status" && ["Non Exploitable", "En Maintenance", "Disponible"].includes(value)) {
+      setEquipement((prevState) => ({ ...prevState, local_id: "", salle_id: "" }));
+      setSalles([]);
     }
   };
 
   const handleEquipementChange = (event, newValue) => {
     setEquipement((prevState) => ({
       ...prevState,
-      nom_equipement: newValue || "", // Mettre à jour le nom de l'équipement
+      nom_equipement: newValue || "",
     }));
   };
 
   const handleSubmit = async () => {
-    // Vérifier que tous les champs sont remplis
     if (!equipement.nom_equipement || !equipement.status) {
       alert("Veuillez remplir tous les champs.");
       return;
     }
 
-    // Si le statut est "En Utilisation", vérifier que local_id et salle_id sont remplis
-    if (
-      equipement.status === "En Utilisation" &&
-      (!equipement.local_id || !equipement.salle_id)
-    ) {
+    if (equipement.status === "En Utilisation" && (!equipement.local_id || !equipement.salle_id)) {
       alert("Veuillez sélectionner un local et une salle.");
       return;
     }
 
     try {
-      // Vérifier si l'équipement existe déjà dans la base de données
-      const equipementExists = equipements.includes(equipement.nom_equipement);
+      const response = await fetch("http://localhost:5000/api/addEquipement", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(equipement),
+      });
 
-        // Si l'équipement n'existe pas, l'ajouter à la base de données
-        const response = await fetch("http://localhost:5000/api/addEquipement", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(equipement),
-        });
-
-        if (response.ok) {
-          console.log("Équipement ajouté avec succès !");
-          alert("Équipement ajouté avec succès !");
-          setEquipement({
-            nom_equipement: "",
-            status: "",
-            local_id: "",
-            salle_id: "",
-          });
-          if (onCancel) onCancel();
-          if (onEquipementAdded) onEquipementAdded();
-        }
+      if (response.ok) {
+        alert("Équipement ajouté avec succès !");
+        setEquipement({ nom_equipement: "", status: "", local_id: "", salle_id: "", image_url: "" });
+        if (onCancel) onCancel();
+        if (onEquipementAdded) onEquipementAdded();
+      }
     } catch (error) {
       console.error("Erreur lors de l'envoi de la requête:", error);
       alert("Erreur lors de l'envoi de la requête");
@@ -162,16 +126,10 @@ function AddEquipement({ onCancel, onEquipementAdded }) {
   };
 
   const handleCancel = () => {
-    setEquipement({
-      nom_equipement: "",
-      status: "",
-      local_id: "",
-      salle_id: "",
-    });
+    setEquipement({ nom_equipement: "", status: "", local_id: "", salle_id: "", image_url: "" });
     if (onCancel) onCancel();
   };
 
-  // Déterminer si les sélecteurs de local et de salle doivent être affichés
   const showLocalAndSalle = equipement.status === "En Utilisation";
 
   return (
@@ -184,47 +142,40 @@ function AddEquipement({ onCancel, onEquipementAdded }) {
         </SoftBox>
         <SoftBox flexWrap="wrap" display="flex" justifyContent="space-between" ml={3}>
           <SoftBox flex={1} mr={3}>
-          <Autocomplete
-  freeSolo
-  options={equipements}
-  value={equipement.nom_equipement}
-  getOptionLabel={(option) => option.nom || option} // Assure-toi que chaque option a une valeur lisible
-  renderOption={(props, option) => (
-    <li {...props} key={option.id || option}> {/* Ajoute la clé ici */}
-      {option.nom || option}
-    </li>
-  )}
-  onChange={handleEquipementChange}
-  onInputChange={(event, newValue) => {
-    setEquipement((prevState) => ({
-      ...prevState,
-      nom_equipement: newValue || "",
-    }));
-  }}
-  renderInput={(params) => (
-    <TextField {...params} placeholder="Nom de l'équipement" fullWidth />
-  )}
-/>
-
+            <Autocomplete
+              freeSolo
+              options={equipements}
+              value={equipement.nom_equipement}
+              getOptionLabel={(option) => option.nom || option}
+              renderOption={(props, option) => (
+                <li {...props} key={option.id || option}>{option.nom || option}</li>
+              )}
+              onChange={handleEquipementChange}
+              onInputChange={(event, newValue) => setEquipement((prevState) => ({ ...prevState, nom_equipement: newValue || "" }))}
+              renderInput={(params) => <TextField {...params} placeholder="Nom de l'équipement" fullWidth />}
+            />
           </SoftBox>
+
           <SoftBox flex={1} mr={3}>
-            <Select
-              name="status"
-              value={equipement.status}
+            <SoftInput
+              name="image_url"
+              placeholder="URL de l'image"
+              value={equipement.image_url}
               onChange={handleChange}
-              displayEmpty
               fullWidth
-            >
-              <MenuItem value="" disabled>
-                Sélectionner un statut
-              </MenuItem>
+            />
+          </SoftBox>
+
+          <SoftBox flex={1} mr={3}>
+            <Select name="status" value={equipement.status} onChange={handleChange} displayEmpty fullWidth>
+              <MenuItem value="" disabled>Sélectionner un statut</MenuItem>
               <MenuItem value="En Maintenance">En Maintenance</MenuItem>
               <MenuItem value="En Utilisation">En Utilisation</MenuItem>
               <MenuItem value="Disponible">Disponible</MenuItem>
               <MenuItem value="Non Exploitable">Non Exploitable</MenuItem>
             </Select>
           </SoftBox>
-          {/* Afficher le sélecteur du local uniquement si le statut est "En Utilisation" */}
+
           {showLocalAndSalle && (
             <SoftBox flex={1} mr={3}>
               <Select
@@ -246,7 +197,6 @@ function AddEquipement({ onCancel, onEquipementAdded }) {
               </Select>
             </SoftBox>
           )}
-          {/* Afficher le sélecteur de la salle uniquement si un local est sélectionné et le statut est "En Utilisation" */}
           {showLocalAndSalle && equipement.local_id && (
             <SoftBox flex={1} mr={3}>
               <Select
@@ -270,23 +220,13 @@ function AddEquipement({ onCancel, onEquipementAdded }) {
           )}
         </SoftBox>
         <SoftBox display="flex" justifyContent="center" mt={3} mb={3} gap={3}>
-          <SoftButton variant="gradient" color="error" sx={{ width: "47%" }} onClick={handleCancel}>
-            Annuler
-          </SoftButton>
-          <SoftButton
-            variant="gradient"
-            color="secondary"
-            sx={{ width: "47%" }}
-            onClick={handleSubmit}
-          >
-            Confirmer
-          </SoftButton>
+          <SoftButton variant="gradient" color="error" onClick={handleCancel}>Annuler</SoftButton>
+          <SoftButton variant="gradient" color="secondary" onClick={handleSubmit}>Confirmer</SoftButton>
         </SoftBox>
       </Card>
     </SoftBox>
   );
 }
-
 AddEquipement.propTypes = {
   onCancel: PropTypes.func.isRequired,
   onEquipementAdded: PropTypes.func.isRequired,

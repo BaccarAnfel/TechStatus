@@ -7,32 +7,32 @@ import EditIcon from "@mui/icons-material/Edit";
 import IconButton from "@mui/material/IconButton";
 import Alert from "@mui/material/Alert";
 import ArchiveIcon from "@mui/icons-material/Archive";
-import PrintIcon from "@mui/icons-material/Print"; // Importer l'icône d'impression
+import PrintIcon from "@mui/icons-material/Print";
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
+import InputLabel from "@mui/material/InputLabel";
+import FormControl from "@mui/material/FormControl";
 
 function CommandeTable() {
   const [commandes, setCommandes] = useState([]); // State pour stocker les données des commandes
   const [loading, setLoading] = useState(true); // State pour le chargement
   const [error, setError] = useState(null); // State pour les erreurs
   const [success, setSuccess] = useState(null); // State pour les messages de succès
+  const [filterStatus, setFilterStatus] = useState("all"); // State pour le filtre de statut
   const navigate = useNavigate();
 
-  // Récupérer les données des commandes au chargement du composant
   useEffect(() => {
     const fetchCommandesData = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/commandes"); // API pour récupérer les commandes
+        const response = await fetch("http://localhost:5000/api/commandes");
         const data = await response.json();
-        console.log("Données récupérées:", data);
-
         if (Array.isArray(data)) {
-          // Trier les commandes par command_id
           const sortedCommandes = data.sort((a, b) => a.command_id - b.command_id);
           setCommandes(sortedCommandes);
         } else {
           console.error("Expected an array but got:", data);
-          setCommandes([]); // Fallback à un tableau vide
+          setCommandes([]);
         }
-
         setLoading(false);
       } catch (error) {
         console.error("Erreur lors de la récupération des données :", error);
@@ -40,11 +40,9 @@ function CommandeTable() {
         setLoading(false);
       }
     };
-
     fetchCommandesData();
   }, []);
 
-  // Fonction pour archiver une commande
   const handleArchive = async (commandId) => {
     try {
       const response = await fetch(`http://localhost:5000/api/commandes/archive/${commandId}`, {
@@ -52,7 +50,6 @@ function CommandeTable() {
       });
       if (response.ok) {
         setSuccess("Commande archivée avec succès");
-        // Retirer la commande archivée de la liste
         const updatedCommandes = commandes.filter((commande) => commande.command_id !== commandId);
         setCommandes(updatedCommandes);
       } else {
@@ -64,211 +61,79 @@ function CommandeTable() {
     }
   };
 
-  // Fonction pour rediriger vers le composant PrintCommande
   const handlePrint = (commandId) => {
-    navigate(`/commandes/${commandId}/print`); // Rediriger vers PrintCommande avec l'ID de la commande
+    navigate(`/commandes/${commandId}/print`);
   };
 
+  const filteredCommandes = commandes.filter((commande) => {
+    if (filterStatus === "all") {
+      return true;
+    } else {
+      return commande.status_cmd === filterStatus;
+    }
+  });
+
   if (loading) {
-    return (
-      <SoftBox py={3}>
-        <SoftTypography variant="h6">Chargement...</SoftTypography>
-      </SoftBox>
-    );
+    return <div>Chargement...</div>;
   }
 
   if (!Array.isArray(commandes)) {
-    return (
-      <SoftBox py={3}>
-        <SoftTypography variant="h6" color="error">
-          Erreur: Les données reçues ne sont pas valides.
-        </SoftTypography>
-      </SoftBox>
-    );
+    return <div>Erreur: Les données reçues ne sont pas valides.</div>;
   }
 
   return (
     <Card>
       <SoftBox p={3}>
-        <SoftTypography variant="h6" fontWeight="bold" mb={2}>
-          {`Table des Commandes`}
-        </SoftTypography>
-
+        <SoftBox display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+          <SoftTypography variant="h6" fontWeight="bold">Table des Commandes</SoftTypography>
+          <FormControl variant="outlined" size="small">
+            <Select
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value)}
+              style={{ minWidth: 120 }}
+            >
+              <MenuItem value="all">Filtre: Tous</MenuItem>
+              <MenuItem value="En cours">Filtre: En cours</MenuItem>
+              <MenuItem value="Terminée">Filtre: Terminée</MenuItem>
+            </Select>
+          </FormControl>
+        </SoftBox>
         {/* Affichage des messages d'erreur ou de succès */}
-        {error && (
-          <Alert severity="error" sx={{ mb: 2 }}>
-            {error}
-          </Alert>
-        )}
-        {success && (
-          <Alert severity="success" sx={{ mb: 2 }}>
-            {success}
-          </Alert>
-        )}
-
-        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+        {error && <Alert severity="error">{error}</Alert>}
+        {success && <Alert severity="success">{success}</Alert>}
+        <table style={styles.table}>
           <thead>
             <tr>
-              <th
-                style={{
-                  textAlign: "left",
-                  padding: "10px 15px",
-                  color: "#8392ab",
-                  fontWeight: "bold",
-                  fontSize: "14px",
-                  borderBottom: "1px solid #e0e0e0",
-                }}
-              >
-                N°
-              </th>
-              <th
-                style={{
-                  textAlign: "left",
-                  padding: "10px 15px",
-                  color: "#8392ab",
-                  fontWeight: "bold",
-                  fontSize: "14px",
-                  borderBottom: "1px solid #e0e0e0",
-                }}
-              >
-                ID DE COMMANDE
-              </th>
-              <th
-                style={{
-                  textAlign: "left",
-                  padding: "10px 15px",
-                  color: "#8392ab",
-                  fontWeight: "bold",
-                  fontSize: "14px",
-                  borderBottom: "1px solid #e0e0e0",
-                }}
-              >
-                STATUT
-              </th>
-              <th
-                style={{
-                  textAlign: "left",
-                  padding: "10px 15px",
-                  color: "#8392ab",
-                  fontWeight: "bold",
-                  fontSize: "14px",
-                  borderBottom: "1px solid #e0e0e0",
-                }}
-              >
-                UTILISATEUR
-              </th>
-              <th
-                style={{
-                  textAlign: "left",
-                  padding: "10px 15px",
-                  color: "#8392ab",
-                  fontWeight: "bold",
-                  fontSize: "14px",
-                  borderBottom: "1px solid #e0e0e0",
-                }}
-              >
-                DATE DE COMMANDE
-              </th>
-              <th
-                style={{
-                  textAlign: "center",
-                  padding: "10px 15px",
-                  color: "#8392ab",
-                  fontWeight: "bold",
-                  fontSize: "14px",
-                  borderBottom: "1px solid #e0e0e0",
-                }}
-              >
-                ACTION
-              </th>
+              <th style={styles.header}>N°</th>
+              <th style={styles.header}>ID DE COMMANDE</th>
+              <th style={styles.header}>STATUT</th>
+              <th style={styles.header}>UTILISATEUR</th>
+              <th style={styles.header}>DATE DE COMMANDE</th>
+              <th style={styles.header}>ACTION</th>
             </tr>
           </thead>
           <tbody>
-            {commandes.map((commande, index) => (
-              <tr key={commande.command_id}>
-                <td
-                  style={{
-                    padding: "10px 15px",
-                    fontSize: "14px",
-                    color: "#344767",
-                    borderBottom: index !== commandes.length - 1 ? "1px solid #e0e0e0" : "none",
-                  }}
-                >
-                  {index + 1} {/* Numéro d'ordre séquentiel */}
-                </td>
-                <td
-                  style={{
-                    padding: "10px 15px",
-                    fontSize: "14px",
-                    color: "#344767",
-                    borderBottom: index !== commandes.length - 1 ? "1px solid #e0e0e0" : "none",
-                  }}
-                >
-                  {commande.command_id} {/* ID de la commande */}
-                </td>
-                <td
-                  style={{
-                    padding: "10px 15px",
-                    fontSize: "14px",
-                    color: "#344767",
-                    borderBottom: index !== commandes.length - 1 ? "1px solid #e0e0e0" : "none",
-                  }}
-                >
-                  {commande.status_cmd || "N/A"} {/* Statut de la commande */}
-                </td>
-                <td
-                  style={{
-                    padding: "10px 15px",
-                    fontSize: "14px",
-                    color: "#344767",
-                    borderBottom: index !== commandes.length - 1 ? "1px solid #e0e0e0" : "none",
-                  }}
-                >
-                  {commande.nom_utilisateur || "N/A"} {/* Nom de l'utilisateur */}
-                </td>
-                <td
-                  style={{
-                    padding: "10px 15px",
-                    fontSize: "14px",
-                    color: "#344767",
-                    borderBottom: index !== commandes.length - 1 ? "1px solid #e0e0e0" : "none",
-                  }}
-                >
-                  {commande.date || "N/A"} {/* Date de la commande */}
-                </td>
-                <td
-                  style={{
-                    padding: "10px 15px",
-                    textAlign: "center",
-                    fontSize: "14px",
-                    color: "#344767",
-                    borderBottom: index !== commandes.length - 1 ? "1px solid #e0e0e0" : "none",
-                  }}
-                >
-                  {/* Bouton Modifier */}
-                  <IconButton
+            {filteredCommandes.map((commande, index) => (
+              <tr key={commande.command_id} style={styles.cell}>
+                <td style={styles.cell}>{index + 1}</td>
+                <td style={styles.cell}>{commande.command_id}</td>
+                <td style={styles.cell}>{commande.status_cmd || "N/A"}</td>
+                <td style={styles.cell}>{commande.nom_utilisateur || "N/A"}</td>
+                <td style={styles.cell}>{commande.date || "N/A"}</td>
+                <td style={styles.cell}>
+                  <IconButton 
                     color="primary"
-                    onClick={() => navigate(`/edit-commande/${commande.command_id}`)}
-                    disabled={commande.status_cmd == "Terminée"}
-                  >
+                    onClick={() => navigate(`/edit-commande/${commande.command_id}`)} 
+                    disabled={commande.status_cmd === "Terminée"}>
                     <EditIcon />
                   </IconButton>
-
-                  {/* Bouton Archiver - Désactivé si le statut n'est pas "Terminée" */}
-                  <IconButton
+                  <IconButton 
                     color="info"
-                    onClick={() => handleArchive(commande.command_id)}
-                    disabled={commande.status_cmd !== "Terminée"} // Désactiver si le statut n'est pas "Terminée"
-                  >
+                    onClick={() => handleArchive(commande.command_id)} 
+                    disabled={commande.status_cmd !== "Terminée"}>
                     <ArchiveIcon />
                   </IconButton>
-
-                  {/* Bouton Imprimer - Désactivé si le statut n'est pas "Terminée" */}
-                  <IconButton
-                    color="secondary"
-                    onClick={() => handlePrint(commande.command_id)}
-                    disabled={commande.status_cmd !== "Terminée"} // Désactiver si le statut n'est pas "Terminée"
-                  >
+                  <IconButton onClick={() => handlePrint(commande.command_id)} disabled={commande.status_cmd !== "Terminée"}>
                     <PrintIcon />
                   </IconButton>
                 </td>
@@ -280,5 +145,25 @@ function CommandeTable() {
     </Card>
   );
 }
+const styles = {
+  table: {
+    width: "100%",
+    borderCollapse: "collapse",
+  },
+  header: {
+    textAlign: "left",
+    padding: "10px 15px",
+    color: "#8392ab",
+    fontWeight: "bold",
+    fontSize: "14px",
+    borderBottom: "1px solid #e0e0e0",
+  },
+  cell: {
+    padding: "10px 15px",
+    fontSize: "14px",
+    color: "#344767",
+    borderBottom: "1px solid #e0e0e0",
+  },
+};
 
 export default CommandeTable;

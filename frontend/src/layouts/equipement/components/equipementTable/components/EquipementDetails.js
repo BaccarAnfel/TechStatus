@@ -88,9 +88,9 @@ function EquipementDetails() {
                 style={{ minWidth: 120 }}
               >
                 <MenuItem value="Tous">Filtre: Tous</MenuItem>
-                <MenuItem value="Disponible">Disponible</MenuItem>
-                <MenuItem value="En Utilisation">En Utilisation</MenuItem>
-                <MenuItem value="Non Exploitable">Non Exploitable</MenuItem>
+                <MenuItem value="Disponible">Filtre: Disponible</MenuItem>
+                <MenuItem value="En Utilisation">Filtre: En Utilisation</MenuItem>
+                <MenuItem value="Non Exploitable">Filtre: Non Exploitable</MenuItem>
               </Select>
             </FormControl>
           </SoftBox>

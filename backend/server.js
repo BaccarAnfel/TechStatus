@@ -213,6 +213,34 @@ app.get("/api/equipementsByName", (req, res) => {
     }
   });
 });
+app.get("/api/equipementsByNameAndImage", (req, res) => {
+  const query = `
+    SELECT 
+      equipement.nom_Equipement,
+      MAX(equipement.image_url) AS image_url  -- Utiliser MAX pour obtenir une seule URL d'image par équipement
+    FROM 
+      equipement
+    WHERE 
+      equipement.status_equipement != 'En cours' 
+      AND equipement.Archive = 0
+    GROUP BY 
+      equipement.nom_Equipement;
+  `;
+  db.query(query, (err, results) => {
+    if (err) {
+      console.error("Erreur lors de la récupération des équipements :", err);
+      res.status(500).json({ error: "Erreur de la base de données" });
+    } else {
+      // Envoyer les résultats avec le nom de l'équipement et l'image URL
+      const equipements = results.map(row => ({
+        nom_Equipement: row.nom_Equipement,
+        image_url: row.image_url  // Inclure l'URL de l'image
+      }));
+      res.json(equipements);
+    }
+  });
+});
+
 app.get("/api/equipements-filtre", (req, res) => {
   const query = `
     SELECT 
@@ -361,21 +389,21 @@ app.get("/api/locaux/:local_id/salles", (req, res) => {
   });
 });
 app.post("/api/addEquipement", (req, res) => {
-  const { nom_equipement, status, salle_id } = req.body;
+  const { nom_equipement, status, salle_id, image_url } = req.body;
 
   // Vérifier si les champs obligatoires sont présents
   if (!nom_equipement || !status) {
     return res.status(400).json({ error: "Veuillez fournir un nom d'équipement et un statut." });
   }
 
-  // Requête SQL pour insérer un nouvel équipement avec salle_id
+  // Requête SQL pour insérer un nouvel équipement avec salle_id et image_url
   const query = `
-    INSERT INTO equipement (nom_Equipement, 	status_equipement, salle_id)
-    VALUES (?, ?, ?);
+    INSERT INTO equipement (nom_Equipement, status_equipement, salle_id, image_url)
+    VALUES (?, ?, ?, ?);
   `;
 
   // Exécuter la requête avec les valeurs fournies
-  db.query(query, [nom_equipement, status, salle_id || null], (err, result) => {
+  db.query(query, [nom_equipement, status, salle_id || null, image_url || null], (err, result) => {
     if (err) {
       console.error("Erreur lors de l'ajout de l'équipement:", err);
       res.status(500).json({ error: "Erreur de la base de données" });
@@ -384,6 +412,7 @@ app.post("/api/addEquipement", (req, res) => {
     }
   });
 });
+
 app.put("/api/equipements/:equipement_id", (req, res) => {
   const { equipement_id } = req.params; // Récupérer l'ID de l'équipement depuis les paramètres de la requête
   const { nom_Equipement, status_equipement, salle_id } = req.body; // Récupérer les données à mettre à jour depuis le corps de la requête

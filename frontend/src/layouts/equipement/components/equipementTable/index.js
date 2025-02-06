@@ -16,19 +16,29 @@ function EquipementList() {
   useEffect(() => {
     const fetchEquipementData = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/equipementsByName");
+        const response = await fetch("http://localhost:5000/api/equipementsByNameAndImage");
         if (!response.ok) {
           throw new Error("Erreur lors de la récupération des données");
         }
         const data = await response.json();
-        setEquipements(data);
+        // Filtrer les équipements pour éviter les doublons
+        const uniqueEquipements = [];
+        const seen = new Set();
+
+        data.forEach((equipement) => {
+          if (!seen.has(equipement.nom_Equipement)) {
+            seen.add(equipement.nom_Equipement);
+            uniqueEquipements.push(equipement);
+          }
+        });
+
+        setEquipements(uniqueEquipements);
       } catch (error) {
         setError(error.message);
       } finally {
         setLoading(false);
       }
     };
-
     fetchEquipementData();
   }, []);
 
@@ -57,17 +67,44 @@ function EquipementList() {
       <SoftTypography variant="h6" fontWeight="bold" mb={2}>
         Liste des Types Équipements
       </SoftTypography>
-
       <SoftBox display="flex" flexWrap="wrap" gap={2}>
         {equipements.map((equipement, index) => (
           <Card
             key={index}
             sx={{ minWidth: 200, cursor: "pointer" }}
-            onClick={() => handleCardClick(equipement)}
+            onClick={() => handleCardClick(equipement.nom_Equipement)}
           >
             <CardContent>
-              <Typography variant="h6" component="div">
-                {equipement}
+              {/* Affichage de l'image de l'équipement, ou d'un placeholder si aucune image n'est disponible */}
+              {equipement.image_url ? (
+                <img
+                  src={equipement.image_url}
+                  alt={equipement.nom_Equipement}
+                  style={{
+                    width: "150px",      // Largeur fixe de l'image
+                    height: "150px",     // Hauteur fixe de l'image
+                    objectFit: "cover",  // Pour maintenir le ratio tout en couvrant l'espace
+                    borderRadius: "8px", // Pour arrondir les coins de l'image
+                  }}
+                />
+              ) : (
+                <div
+                  style={{
+                    width: "150px",
+                    height: "150px",
+                    backgroundColor: "#f0f0f0",
+                    borderRadius: "8px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    color: "#666",
+                  }}
+                >
+                  Pas d&apos;image
+                </div>
+              )}
+              <Typography variant="h6" component="div" mt={2}>
+                {equipement.nom_Equipement}
               </Typography>
             </CardContent>
           </Card>
