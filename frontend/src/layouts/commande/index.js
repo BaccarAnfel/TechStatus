@@ -19,32 +19,15 @@ function Commande() {
     <DashboardLayout>
       <DashboardNavbar />
       <SoftBox py={3}>
-        {/* Bouton "Ajouter une commande" */}
-        {!showAddOrder && (
-          <SoftBox mb={3} display="flex" justifyContent="flex-end">
-            <SoftButton
-              variant="gradient"
-              color="dark"
-              onClick={() => setShowAddOrder(true)}
-            >
-              Ajouter une commande
-            </SoftButton>
-          </SoftBox>
-        )}
-
-        {/* Formulaire d'ajout de commande */}
-        {showAddOrder && (
-          <SoftBox mb={3}>
-            <Ordre
-              onCancel={() => setShowAddOrder(false)}
-              onSuccess={() => {
-                setShowAddOrder(false); // Masquer le formulaire
-                refreshCommandes(); // Rafraîchir la table des commandes
-              }}
-            />
-          </SoftBox>
-        )}
-
+        <SoftBox mb={3}>
+          <Ordre
+            onCancel={() => setShowAddOrder(false)}
+            onSuccess={() => {
+              setShowAddOrder(false); // Masquer le formulaire
+              refreshCommandes(); // Rafraîchir la table des commandes
+            }}
+          />
+        </SoftBox>
         {/* Tableau des commandes */}
         <SoftBox mb={3}>
           <CommandeTable key={refreshKey} /> {/* Utiliser la clé pour forcer le rafraîchissement */}

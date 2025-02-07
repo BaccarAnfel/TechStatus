@@ -27,7 +27,7 @@ function Breadcrumbs({ icon, title, route, light = false }) {  // Utiliser une v
             component="span"
             variant="body2"
             color={light ? "white" : "dark"}
-            opacity={light ? 0.8 : 0.5}
+            opacity={light ? 0.8 : 0.9}
             sx={{ lineHeight: 0 }}
           >
             <Icon>{icon}</Icon>
@@ -38,7 +38,7 @@ function Breadcrumbs({ icon, title, route, light = false }) {  // Utiliser une v
             <SoftTypography
               component="span"
               variant="button"
-              fontWeight="regular"
+              fontWeight="bold"
               textTransform="capitalize"
               color={light ? "white" : "dark"}
               opacity={light ? 0.8 : 0.5}
@@ -50,7 +50,7 @@ function Breadcrumbs({ icon, title, route, light = false }) {  // Utiliser une v
         ))}
         <SoftTypography
           variant="button"
-          fontWeight="regular"
+          fontWeight="bold"
           textTransform="capitalize"
           color={light ? "white" : "dark"}
           sx={{ lineHeight: 0 }}
@@ -58,15 +58,6 @@ function Breadcrumbs({ icon, title, route, light = false }) {  // Utiliser une v
           {title.replace("-", " ")}
         </SoftTypography>
       </MuiBreadcrumbs>
-      <SoftTypography
-        fontWeight="bold"
-        textTransform="capitalize"
-        variant="h6"
-        color={light ? "white" : "dark"}
-        noWrap
-      >
-        {title.replace("-", " ")}
-      </SoftTypography>
     </SoftBox>
   );
 }

@@ -131,7 +131,12 @@ function Sidenav({ color = "info", brand = "", brandName, routes, ...rest }) {
             width={!brandName && "100%"}
             sx={(theme) => sidenavLogoLabel(theme, { miniSidenav })}
           >
-            <SoftTypography sx={{ color: 'black' }} component="h6" variant="button" fontWeight="bold">
+            <SoftTypography
+              color="black"
+              component="h6"
+              variant="button"
+              fontWeight="bold"
+            >
               {brandName}
             </SoftTypography>
           </SoftBox>
@@ -142,7 +147,6 @@ function Sidenav({ color = "info", brand = "", brandName, routes, ...rest }) {
     </SidenavRoot>
   );
 }
-
 
 // Typechecking props for the Sidenav
 Sidenav.propTypes = {

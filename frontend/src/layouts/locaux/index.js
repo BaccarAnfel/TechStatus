@@ -21,35 +21,19 @@ function Locaux() {
     <DashboardLayout>
       <DashboardNavbar />
       <SoftBox py={3}>
-        {/* Bouton "Ajouter un local" */}
-        {!showAddLocal && (
-          <SoftBox mb={3} display="flex" justifyContent="flex-end">
-            <SoftButton
-              variant="gradient"
-              color="dark"
-              onClick={() => setShowAddLocal(true)}
-            >
-              Ajouter un local
-            </SoftButton>
-          </SoftBox>
-        )}
+        <AjoutLocal
+          onCancel={() => setShowAddLocal(false)}
+          onLocalAdded={() => {
+            setShowAddLocal(false); // Masquer le formulaire
+            refreshLocaux(); // Rafraîchir la table des locaux
+          }}
+        />
 
-        {/* Formulaire d'ajout de local */}
-        {showAddLocal && (
-          <AjoutLocal
-            onCancel={() => setShowAddLocal(false)}
-            onLocalAdded={() => {
-              setShowAddLocal(false); // Masquer le formulaire
-              refreshLocaux(); // Rafraîchir la table des locaux
-            }}
-          />
-        )}
-
-        {/* Tableau des locaux */}
         <Card>
           <SoftBox p={3}>
             <SoftTypography variant="h6">
-              <LocauxTable key={refreshKey} /> {/* Utiliser la clé pour forcer le rafraîchissement */}
+              <LocauxTable key={refreshKey} />{" "}
+              {/* Utiliser la clé pour forcer le rafraîchissement */}
             </SoftTypography>
           </SoftBox>
         </Card>
