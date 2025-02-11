@@ -19,6 +19,7 @@ import {
   setTransparentNavbar,
   setMiniSidenav,
 } from "context";
+import { grey } from "@mui/material/colors";
 
 function DashboardNavbar({ absolute = false, light = false, isMini = false }) {
   const [navbarType, setNavbarType] = useState();
@@ -78,7 +79,7 @@ function DashboardNavbar({ absolute = false, light = false, isMini = false }) {
             <SoftBox color={light ? "white" : "inherit"}>
               <IconButton
                 size="small"
-                color="inherit"
+                color={grey[600]}
                 sx={navbarMobileMenu}
                 onClick={handleMiniSidenav}
               >

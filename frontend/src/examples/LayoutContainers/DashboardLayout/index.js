@@ -12,7 +12,6 @@ import { useController, setLayout } from "context";
 
 import backgroundImage from "assets/images/bg.jpg";
 
-
 function DashboardLayout({ children }) {
   const [controller, dispatch] = useController();
   const { miniSidenav } = controller;
@@ -31,7 +30,7 @@ function DashboardLayout({ children }) {
         backgroundRepeat: "no-repeat",
         minHeight: "100vh",
         width: "100%",
-        backgroundAttachment: "fixed"
+        backgroundAttachment: "fixed",
       }}
     >
       <SoftBox
