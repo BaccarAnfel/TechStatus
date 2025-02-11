@@ -1,6 +1,7 @@
 import Card from "@mui/material/Card";
 import React, { useEffect, useState } from "react";
 import SoftBox from "components/SoftBox";
+import SoftBadge from "components/SoftBadge";
 import SoftTypography from "components/SoftTypography";
 import { useNavigate } from "react-router-dom";
 import EditIcon from "@mui/icons-material/Edit";
@@ -85,7 +86,9 @@ function CommandeTable() {
     <Card>
       <SoftBox p={3}>
         <SoftBox display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-          <SoftTypography variant="h6" fontWeight="bold">Table des Commandes</SoftTypography>
+          <SoftTypography variant="h6" fontWeight="bold">
+            Table des Commandes
+          </SoftTypography>
           <FormControl variant="outlined" size="small">
             <Select
               value={filterStatus}
@@ -117,23 +120,34 @@ function CommandeTable() {
               <tr key={commande.command_id} style={styles.cell}>
                 <td style={styles.cell}>{index + 1}</td>
                 <td style={styles.cell}>{commande.command_id}</td>
-                <td style={styles.cell}>{commande.status_cmd || "N/A"}</td>
+                <td style={styles.cell}><SoftBadge
+                  variant="gradient"
+                  badgeContent={commande.status_cmd}
+                  color={commande.status_cmd === "En cours" ? "info" : "success"}
+                  size="xs"
+                  container
+                /></td>
                 <td style={styles.cell}>{commande.nom_utilisateur || "N/A"}</td>
                 <td style={styles.cell}>{commande.date || "N/A"}</td>
                 <td style={styles.cell}>
-                  <IconButton 
+                  <IconButton
                     color="primary"
-                    onClick={() => navigate(`/edit-commande/${commande.command_id}`)} 
-                    disabled={commande.status_cmd === "Terminée"}>
+                    onClick={() => navigate(`/edit-commande/${commande.command_id}`)}
+                    disabled={commande.status_cmd === "Terminée"}
+                  >
                     <EditIcon />
                   </IconButton>
-                  <IconButton 
+                  <IconButton
                     color="info"
-                    onClick={() => handleArchive(commande.command_id)} 
-                    disabled={commande.status_cmd !== "Terminée"}>
+                    onClick={() => handleArchive(commande.command_id)}
+                    disabled={commande.status_cmd !== "Terminée"}
+                  >
                     <ArchiveIcon />
                   </IconButton>
-                  <IconButton onClick={() => handlePrint(commande.command_id)} disabled={commande.status_cmd !== "Terminée"}>
+                  <IconButton
+                    onClick={() => handlePrint(commande.command_id)}
+                    disabled={commande.status_cmd !== "Terminée"}
+                  >
                     <PrintIcon />
                   </IconButton>
                 </td>

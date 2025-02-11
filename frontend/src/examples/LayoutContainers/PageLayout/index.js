@@ -10,6 +10,8 @@ import SoftBox from "components/SoftBox";
 
 import { useController, setLayout } from "context";
 
+
+
 function PageLayout({ background, children }) {
   const [, dispatch] = useController();
   const { pathname } = useLocation();

@@ -10,6 +10,9 @@ import SoftBox from "components/SoftBox";
 
 import { useController, setLayout } from "context";
 
+import backgroundImage from "assets/images/bg.jpg";
+
+
 function DashboardLayout({ children }) {
   const [controller, dispatch] = useController();
   const { miniSidenav } = controller;
@@ -20,22 +23,34 @@ function DashboardLayout({ children }) {
   }, [pathname]);
 
   return (
-    <SoftBox
-      sx={({ breakpoints, transitions, functions: { pxToRem } }) => ({
-        p: 3,
-        position: "relative",
-
-        [breakpoints.up("xl")]: {
-          marginLeft: miniSidenav ? pxToRem(120) : pxToRem(274),
-          transition: transitions.create(["margin-left", "margin-right"], {
-            easing: transitions.easing.easeInOut,
-            duration: transitions.duration.standard,
-          }),
-        },
-      })}
+    <div
+      style={{
+        backgroundImage: `url(${backgroundImage})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+        minHeight: "100vh",
+        width: "100%",
+        backgroundAttachment: "fixed"
+      }}
     >
-      {children}
-    </SoftBox>
+      <SoftBox
+        sx={({ breakpoints, transitions, functions: { pxToRem } }) => ({
+          p: 3,
+          position: "relative",
+
+          [breakpoints.up("xl")]: {
+            marginLeft: miniSidenav ? pxToRem(120) : pxToRem(274),
+            transition: transitions.create(["margin-left", "margin-right"], {
+              easing: transitions.easing.easeInOut,
+              duration: transitions.duration.standard,
+            }),
+          },
+        })}
+      >
+        {children}
+      </SoftBox>
+    </div>
   );
 }
 

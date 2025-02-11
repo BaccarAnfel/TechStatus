@@ -159,6 +159,7 @@ function AddEquipement({ onCancel, onEquipementAdded }) {
           <SoftBox flex={1} mr={3}>
             <SoftInput
               name="image_url"
+              icon={{ direction: "left" }}
               placeholder="URL de l'image"
               value={equipement.image_url}
               onChange={handleChange}
@@ -220,8 +221,8 @@ function AddEquipement({ onCancel, onEquipementAdded }) {
           )}
         </SoftBox>
         <SoftBox display="flex" justifyContent="center" mt={3} mb={3} gap={3}>
-          <SoftButton variant="gradient" color="error" onClick={handleCancel}>Annuler</SoftButton>
-          <SoftButton variant="gradient" color="secondary" onClick={handleSubmit}>Confirmer</SoftButton>
+          <SoftButton sx={{ width: "47%" }} variant="gradient" color="error" onClick={handleCancel}>Annuler</SoftButton>
+          <SoftButton sx={{ width: "47%" }} variant="gradient" color="secondary" onClick={handleSubmit}>Confirmer</SoftButton>
         </SoftBox>
       </Card>
     </SoftBox>

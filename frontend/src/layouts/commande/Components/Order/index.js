@@ -145,7 +145,7 @@ function Ordre({ onCancel, onSuccess }) {
       ))}
 
       <SoftBox ml={3} mr={3} mb={2}>
-        <SoftButton variant="gradient" color="dark" fullWidth onClick={handleAddArticle}>
+        <SoftButton variant="gradient" color="info" fullWidth onClick={handleAddArticle}>
           Ajouter un autre article
         </SoftButton>
       </SoftBox>
@@ -155,7 +155,7 @@ function Ordre({ onCancel, onSuccess }) {
           <SoftButton
             sx={{ width: (theme) => theme.spacing(69) }}
             variant="gradient"
-            color="secondary"
+            color="error"
             fullWidth
             onClick={onCancel}
           >

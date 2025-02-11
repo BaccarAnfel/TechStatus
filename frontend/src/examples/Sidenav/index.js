@@ -14,7 +14,6 @@ import Icon from "@mui/material/Icon";
 
 import SoftBox from "components/SoftBox";
 import SoftTypography from "components/SoftTypography";
-import SoftButton from "components/SoftButton";
 
 import SidenavCollapse from "examples/Sidenav/SidenavCollapse";
 
@@ -23,9 +22,8 @@ import SidenavRoot from "examples/Sidenav/SidenavRoot";
 import sidenavLogoLabel from "examples/Sidenav/styles/sidenav";
 
 import { useController, setMiniSidenav } from "context";
-import { Gradient } from "@mui/icons-material";
 
-function Sidenav({ color = "info", brand = "", brandName, routes, ...rest }) {
+function Sidenav({ color = "error", brand = "", brandName, routes, ...rest }) {
   const [controller, dispatch] = useController();
   const { miniSidenav, transparentSidenav } = controller;
   const location = useLocation();

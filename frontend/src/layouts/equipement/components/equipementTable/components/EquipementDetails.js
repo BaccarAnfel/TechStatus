@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import SoftBox from "components/SoftBox";
+import SoftBadge from "components/SoftBadge";
 import SoftTypography from "components/SoftTypography";
 import Alert from "@mui/material/Alert";
 import IconButton from "@mui/material/IconButton";
@@ -12,6 +13,19 @@ import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
+
+function getBadgeColor(status) {
+  switch (status) {
+    case "Disponible":
+      return "success";
+    case "En Utilisation":
+      return "warning";
+    case "Non Exploitable":
+      return "error";
+    default:
+      return "info";
+  }
+}
 
 function EquipementDetails() {
   const { equipementName } = useParams();
@@ -45,12 +59,17 @@ function EquipementDetails() {
 
   const handleArchive = async (equipementId) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/equipements/archive/${equipementId}`, {
-        method: "PUT",
-      });
+      const response = await fetch(
+        `http://localhost:5000/api/equipements/archive/${equipementId}`,
+        {
+          method: "PUT",
+        }
+      );
       if (response.ok) {
         setSuccess("Équipement archivé avec succès");
-        const updatedDetails = details.filter((equipement) => equipement.equipement_id !== equipementId);
+        const updatedDetails = details.filter(
+          (equipement) => equipement.equipement_id !== equipementId
+        );
         setDetails(updatedDetails);
       } else {
         setError("Erreur lors de l'archivage de l'équipement");
@@ -103,7 +122,6 @@ function EquipementDetails() {
                 <tr>
                   <th style={styles.header}>NOM DE L&apos;ÉQUIPEMENT</th>
                   <th style={styles.header}>STATUS ÉQUIPEMENT</th>
-                  <th style={styles.header}>SALLE ID</th>
                   <th style={styles.header}>COMMANDE ID</th>
                   <th style={{ ...styles.header, textAlign: "center" }}>ACTIONS</th>
                 </tr>
@@ -112,7 +130,15 @@ function EquipementDetails() {
                 {filteredDetails.map((equipement, index) => (
                   <tr key={index}>
                     <td style={styles.cell}>{equipement.nom_Equipement}</td>
-                    <td style={styles.cell}>{equipement.status_equipement || "N/A"}</td>
+                    <td style={styles.cell}>
+                      <SoftBadge
+                        variant="gradient"
+                        badgeContent={equipement.status_equipement}
+                        color={getBadgeColor(equipement.status_equipement)}
+                        size="xs"
+                        container
+                      />
+                    </td>
                     <td style={styles.cell}>{equipement.salle_id || "N/A"}</td>
                     <td style={styles.cell}>{equipement.command_id || "N/A"}</td>
                     <td style={{ ...styles.cell, textAlign: "center" }}>
